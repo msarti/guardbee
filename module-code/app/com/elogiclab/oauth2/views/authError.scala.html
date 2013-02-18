@@ -1,0 +1,12 @@
+
+@(errorKey:String, errorMessage: String)(implicit request: RequestHeader)
+
+@main(Messages("securesocial.notAuthorized.title")) {
+    <div class="page-header">
+        <h1>@Messages("securesocial.notAuthorized.title")</h1>
+    </div>
+
+    <div class="alert alert-error">
+    	@errorKey : @Messages(errorMessage)
+    </div>
+}

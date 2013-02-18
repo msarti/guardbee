@@ -1,0 +1,21 @@
+@(title: String)(content: Html)
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <span class="brand" >@Messages("play2-oauth.appName")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="padding-top:30px">
+            @content
+        </div>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+2000:com.elogiclab.oauth2.controller.DefaultTemplatesPlugin
+2001:services.InMemoryClientIdService
+2002:services.InMemoryScopeService
+
+1500:com.typesafe.plugin.CommonsMailerPlugin
+9996:securesocial.core.providers.utils.DefaultPasswordValidator
+9997:securesocial.controllers.DefaultTemplatesPlugin
+9998:services.InMemoryUserService
+9999:securesocial.core.providers.utils.BCryptPasswordHasher
+10004:securesocial.core.providers.UsernamePasswordProvider
+
+10005:com.elogiclab.oauth2.authz.core.SecureSocialWrapperService
