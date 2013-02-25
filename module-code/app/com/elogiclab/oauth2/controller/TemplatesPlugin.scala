@@ -7,6 +7,8 @@ import play.api.templates.Html
 import play.api.Application
 import com.elogiclab.oauth2.views.html.authError
 import play.api.Play.current
+import play.api.data.Form
+import com.elogiclab.oauth2.views.html.authRequestForm
 
 trait TemplatesPlugin extends Plugin {
 
@@ -15,12 +17,14 @@ trait TemplatesPlugin extends Plugin {
   }
 
   def getAuthErrorPage[A](errorKey:String, errorMessage: String)(implicit request: Request[A]): Html
+  def getAuthRequestForm[A](authForm: AuthForm)(implicit request: Request[A]): Html
 
 }
 
 class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
 
   def getAuthErrorPage[A](errorKey:String, errorMessage: String)(implicit request: Request[A]): Html = authError(errorKey, errorMessage)
+  def getAuthRequestForm[A](authForm: AuthForm)(implicit request: Request[A]): Html = authRequestForm(authForm)
 
 }
 
@@ -34,6 +38,9 @@ object TemplatesHelper {
   
   def getAuthErrorPage[A](errorKey:String,errorMessage: String)(implicit request: Request[A]): Html = {
     templateAPI.getAuthErrorPage(errorKey, errorMessage)(request)
+  }
+  def getAuthRequestForm[A](authForm: AuthForm)(implicit request: Request[A]): Html = {
+    templateAPI.getAuthRequestForm(authForm)(request)
   }
 
 }

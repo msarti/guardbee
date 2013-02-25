@@ -40,3 +40,37 @@ class InMemoryScopeService (application: Application) extends ScopeServicePlugin
   }
 
 }
+
+
+class InMemoryUserAuthorizationService(application: Application) extends UserAuthorizationServicePlugin(application) {
+
+  private var authotizations = Map[String, UserAuthorization]()
+
+  
+  def save(authorization: UserAuthorization): UserAuthorization = {
+    authotizations += ( (authorization.clientId + authorization.userId) -> authorization)
+    authorization
+  }
+
+  def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization] = {
+    authotizations.get((clientId + userId))
+  }
+
+  def delete(clientId: String, userId: String): Unit = {
+    authotizations -= (clientId + userId)
+  }
+
+  def enable(clientId: String, userId: String): Option[UserAuthorization] = {
+    authotizations.get((clientId + userId)) match {
+      case None => None
+      case Some(value) => {
+        val newValue = SimpleUserAuthorization(value.clientId, value.userId, value.grantedOn, true)
+        authotizations += ( (newValue.clientId + newValue.userId) -> newValue)
+        Some(newValue)
+      }
+      
+    }
+  }
+
+  
+}

@@ -5,10 +5,11 @@ import PlayProject._
 object ApplicationBuild extends Build {
 
     val appName         = "play2-oauth"
-    val appVersion      = "1.0-SNAPSHOT"
+    val appVersion      = "master"
 
     val appDependencies = Seq(
-      "securesocial" % "securesocial_2.9.1" % "2.0.8"
+      "securesocial" % "securesocial_2.9.1" % "2.0.8",
+      "joda-time" % "joda-time" % "2.1"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(

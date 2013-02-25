@@ -5,6 +5,10 @@ import play.api.mvc.WrappedRequest
 import play.api.mvc.AnyContent
 import play.api.mvc.Result
 import play.api.mvc.Action
+import play.api.mvc.Request
+
+
+case class AuthWrappedRequest[A](user: String, request: Request[A]) extends WrappedRequest(request)
 
 trait ServerSecurityService extends Plugin {
 
@@ -13,7 +17,8 @@ trait ServerSecurityService extends Plugin {
     Logger.info("Starting ServerAuthService instance: %s".format(getClass.getName))
   }
 
-  def SecuredAction(f: WrappedRequest[AnyContent] => Result): Action[AnyContent]
+  
+  def SecuredAction(f: AuthWrappedRequest[AnyContent] => Result): Action[AnyContent]
 
 }
 
@@ -25,7 +30,7 @@ object ServerSecurityService {
     delegate = Some(service);
   }
 
-  def SecuredAction(f: WrappedRequest[AnyContent] => Result): Action[AnyContent] = {
+  def SecuredAction(f: AuthWrappedRequest[AnyContent] => Result): Action[AnyContent] = {
     delegate.map(_.SecuredAction(f)).getOrElse {
       notInitialized()
       null

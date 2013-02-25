@@ -7,8 +7,17 @@ import play.api.Logger
 trait ClientIdentity {
   def clientId: String
   def clientSecret: String
+  def applicationName: String
+  def applicationDescription: Option[String]
   def redirectURIs: Seq[String]
 }
+
+case class SimpleClientId(
+    clientId: String, 
+    clientSecret: String, 
+    applicationName: String, 
+    applicationDescription: Option[String], 
+    redirectURIs: Seq[String]) extends ClientIdentity
 
 trait ClientIdService {
   

@@ -1,0 +1,24 @@
+
+@(authForm: com.elogiclab.oauth2.controller.AuthForm)(implicit request: RequestHeader)
+
+@main(Messages("play-oauth2.authRequestForm.title")) {
+    <div class="page-header">
+        <h1>@Messages("play-oauth2.authRequestForm.title")</h1>
+    </div>
+    
+    <form class="form" method="post" action="@com.elogiclab.oauth2.utils.RoutesHelper.authz.absoluteURL(false)">
+    	<input type="hidden" name="client_id" value="@authForm.client_id.clientId">
+    	<input type="hidden" name="response_type" value="@authForm.response_type">
+    	<input type="hidden" name="redirect_uri" value="@authForm.redirect_uri">
+    	<input type="hidden" name="scope" value="@authForm.scope.scope">
+    	<input type="hidden" name="state" value="@authForm.state">
+    	<ul class="fieldset">
+    		<li class="field">@Messages("play-oauth2.authRequestForm.userMessage")</li>
+			<li class="field submit"><input type="submit" value="@Messages("play-oauth2.authRequestForm.submit")"></li>    	
+    	</ul>
+    
+    
+    </form>
+    
+    
+}

@@ -3,13 +3,20 @@ package com.elogiclab.oauth2.authz.core
 import play.api.mvc.Action
 import play.api.mvc._
 import play.api.Application
+import securesocial.core.Identity
+
+
 
 class SecureSocialWrapperService(application: Application) extends ServerSecurityService {
 
   
   object provider extends securesocial.core.SecureSocial
   
+  
 
-  def SecuredAction(f: WrappedRequest[AnyContent] => Result): Action[AnyContent] = provider.SecuredAction(f)
+  def SecuredAction(f: AuthWrappedRequest[AnyContent] => Result): Action[AnyContent] = provider.SecuredAction {
+    implicit request => 
+    f(AuthWrappedRequest(request.user.id.id, request))
+  }
 
 }
