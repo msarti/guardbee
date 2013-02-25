@@ -16,4 +16,6 @@ project/plugins/project/
 .project
 .classpath
 .cache
+.target/
+
 
