@@ -1,4 +1,4 @@
-play2-oauth
-===========
+GUARDBEE
+========
 
-Play2 plugin for OAuth2 provider
+GuardBee - Play20 plugin for OAuth2 provider
