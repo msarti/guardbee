@@ -8,11 +8,12 @@ import play.api.Plugin
 trait UserAuthorization {
   def clientId: String
   def userId: String
+  def verificationCode: String
   def grantedOn: DateTime
   def enabled: Boolean
 }
 
-case class SimpleUserAuthorization(clientId: String, userId: String, grantedOn: DateTime, enabled: Boolean) extends UserAuthorization
+case class SimpleUserAuthorization(clientId: String, userId: String, verificationCode: String, grantedOn: DateTime, enabled: Boolean) extends UserAuthorization
 
 trait UserAuthorizationService {
 

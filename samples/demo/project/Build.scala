@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-      "play2-oauth" % "play2-oauth_2.9.1" % "master"
+      "guardbee" % "guardbee_2.9.1" % "master"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(

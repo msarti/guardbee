@@ -4,13 +4,20 @@ import java.util.Date
 import play.api.Logger
 import play.api.Application
 import play.api.Plugin
+import org.joda.time.DateTime
 
 trait AuthCode {
   def code: String
   def userId: String
-  def creationTime: Date
-  def expireOn: Date
+  def creationTime: DateTime
+  def expireOn: DateTime
 }
+
+case class SimpleAuthCode(
+  code: String,
+  userId: String,
+  creationTime: DateTime,
+  expireOn: DateTime) extends AuthCode
 
 /**
  * @author marco
@@ -25,7 +32,7 @@ trait AuthCodeService {
   def save(authCode: AuthCode): AuthCode
 
   /**
-   * @param code 
+   * @param code
    * @return
    */
   def consume(code: String): Option[AuthCode]

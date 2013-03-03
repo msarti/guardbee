@@ -2,20 +2,15 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>@title</title>
-    </head>
-    <body>
-        <div class="navbar navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container">
-                    <span class="brand" >@Messages("play2-oauth.appName")</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="container" style="padding-top:30px">
-            @content
-        </div>
-    </body>
+<head>
+<link rel="stylesheet" media="screen" href="/assets/guardbee/css/kube.min.css">
+<link rel="stylesheet" media="screen" href="/assets/guardbee/css/master.css">
+<title>@title</title>
+</head>
+<body>
+	<div class="container header">
+		<span class="brand">@Messages("guardbee.appName")</span>
+	</div>
+	<div class="container">@content</div>
+</body>
 </html>

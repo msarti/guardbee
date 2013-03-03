@@ -64,7 +64,7 @@ class InMemoryUserAuthorizationService(application: Application) extends UserAut
     authotizations.get((clientId + userId)) match {
       case None => None
       case Some(value) => {
-        val newValue = SimpleUserAuthorization(value.clientId, value.userId, value.grantedOn, true)
+        val newValue = SimpleUserAuthorization(value.clientId, value.userId, value.verificationCode, value.grantedOn, true)
         authotizations += ( (newValue.clientId + newValue.userId) -> newValue)
         Some(newValue)
       }
@@ -74,3 +74,31 @@ class InMemoryUserAuthorizationService(application: Application) extends UserAut
 
   
 }
+
+class InMemoryAuthCodeService(application: Application) extends AuthCodeServicePlugin(application) {
+  
+  private var codes = Map[String, AuthCode]()
+
+  
+  def save(authCode: AuthCode): AuthCode = {
+    codes += (authCode.code -> authCode)
+    authCode
+  }
+
+  /**
+   * @param code 
+   * @return
+   */
+  def consume(code: String): Option[AuthCode] = {
+    codes.get(code) match {
+      case None => None
+      case Some(authCode) => {
+    	codes -= code
+        Some(authCode)
+      }
+      
+    }
+  }
+
+}
+

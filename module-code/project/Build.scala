@@ -4,7 +4,7 @@ import PlayProject._
 
 object ApplicationBuild extends Build {
 
-    val appName         = "play2-oauth"
+    val appName         = "guardbee"
     val appVersion      = "master"
 
     val appDependencies = Seq(

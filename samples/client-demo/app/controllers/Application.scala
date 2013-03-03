@@ -17,7 +17,8 @@ object Application extends Controller {
             "redirect_uri" -> Seq("http://localhost:9001/code"),
             "client_id" -> Seq("test_client_id"),
             "response_type" -> Seq("code"),
-            "scope" -> Seq("get_email")
+            "scope" -> Seq("get_email"),
+            "state" -> Seq("http://localhost:9001/protected")
             ))
   }
   

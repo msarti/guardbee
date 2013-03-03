@@ -15,7 +15,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     Logger.info("Application has started")
     
-    ClientIdService.save(ClientId("test_client_id", "secret", Seq("http://localhost:9001/code")))
+    ClientIdService.save(ClientId("test_client_id", "secret", "Application Name", Some("Description"), Seq("http://localhost:9001/code")))
     ScopeService.save(AppScope("get_email"))
     UserService.save(SocialUser(UserId("test@example.com", "userpass"), 
         "First name", "Last Name", "full name", Some("test@example.com"), None, 

@@ -2,6 +2,7 @@
 2001:services.InMemoryClientIdService
 2002:services.InMemoryScopeService
 2003:services.InMemoryUserAuthorizationService
+2004:services.InMemoryAuthCodeService
 
 1500:com.typesafe.plugin.CommonsMailerPlugin
 9996:securesocial.core.providers.utils.DefaultPasswordValidator
