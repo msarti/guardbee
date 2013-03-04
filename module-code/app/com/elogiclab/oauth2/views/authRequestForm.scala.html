@@ -1,18 +1,13 @@
 
-@(authForm: com.elogiclab.oauth2.controller.AuthForm)(implicit request: RequestHeader)
+@(client: com.elogiclab.oauth2.authz.core.ClientIdentity, authzCode: String)(implicit request: RequestHeader)
 
 @main(Messages("guardbee.authRequestForm.title")) {
     <div class="page-header">
         <h1>@Messages("guardbee.authRequestForm.title")</h1>
     </div>
     
-    <form class="forms" method="post" action="@com.elogiclab.oauth2.utils.RoutesHelper.authz.absoluteURL(false)">
-    	<input type="hidden" name="client_id" value="@authForm.client_id.clientId">
-    	<input type="hidden" name="response_type" value="@authForm.response_type">
-    	<input type="hidden" name="redirect_uri" value="@authForm.redirect_uri">
-    	<input type="hidden" name="scope" value="@authForm.scope.scope">
-    	<input type="hidden" name="state" value="@authForm.state">
-    	<input type="hidden" name="code" value="@authForm.code">
+    <form class="forms" method="post" action="@com.elogiclab.oauth2.utils.RoutesHelper.authz(authzCode).absoluteURL(false)">
+    	<input type="hidden" name="authzCode" value="@authzCode">
     	<ul>
     		<li>@Messages("guardbee.authRequestForm.userMessage")</li>
 			<li>

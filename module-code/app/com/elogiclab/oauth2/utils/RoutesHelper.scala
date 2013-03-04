@@ -9,9 +9,9 @@ object RoutesHelper {
   lazy val aep = Play.application.classloader.loadClass("com.elogiclab.oauth2.controller.ReverseAuthzEndpoint")
   lazy val authEndpointMethods = aep.newInstance().asInstanceOf[{
     def auth(): Call
-    def authz(): Call
+    def authz(authzCode: String): Call
   }]
   
-  def authz() = authEndpointMethods.authz()
+  def authz(authzCode: String) = authEndpointMethods.authz(authzCode)
 
 }

@@ -5,25 +5,53 @@ import play.api.Logger
 import play.api.Application
 import play.api.Plugin
 
-trait UserAuthorization {
-  def clientId: String
-  def userId: String
-  def verificationCode: String
-  def grantedOn: DateTime
-  def enabled: Boolean
+trait AuthorizationRequest {
+  def code: String
+  
+  def client_id: String
+  def user: String
+  def response_type: String
+  def redirect_uri: String
+  def scope: String
+  def state: Option[String]
+  def request_timestamp: DateTime
+  def request_expiration: DateTime
+  
+  def isExpired = DateTime.now isAfter request_expiration
 }
 
-case class SimpleUserAuthorization(clientId: String, userId: String, verificationCode: String, grantedOn: DateTime, enabled: Boolean) extends UserAuthorization
+
+case class SimpleAutorizationRequest(
+    code: String, 
+    client_id: String, 
+    user: String,
+    response_type: String,
+    redirect_uri: String,
+  	scope: String,
+  	state: Option[String],
+  	request_timestamp: DateTime,
+  	request_expiration: DateTime
+) extends AuthorizationRequest
+
+trait UserAuthorization {
+  def client_id: String
+  def user: String
+  def granted_on: DateTime
+}
+
+case class SimpleUserAuthorization(client_id: String, user: String, granted_on: DateTime) extends UserAuthorization
 
 trait UserAuthorizationService {
 
   def save(authorization: UserAuthorization): UserAuthorization
+  
+  def saveRequest(authzRequest: AuthorizationRequest): AuthorizationRequest
+  
+  def consumeRequest(requestCode: String): Option[AuthorizationRequest]
 
   def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization]
 
   def delete(clientId: String, userId: String): Unit
-
-  def enable(clientId: String, userId: String): Option[UserAuthorization]
 
 }
 
@@ -51,19 +79,28 @@ object UserAuthorizationService {
     }
   }
 
+  def saveRequest(authzRequest: AuthorizationRequest): AuthorizationRequest = {
+    delegate.map(_.saveRequest(authzRequest)).getOrElse {
+      notInitialized()
+      authzRequest
+    }
+  }
+  
+  def consumeRequest(requestCode: String): Option[AuthorizationRequest] = {
+    delegate.map(_.consumeRequest(requestCode)).getOrElse {
+      notInitialized()
+      None
+    }
+  }
+  
   def delete(clientId: String, userId: String): Unit = {
     delegate.map(_.delete(clientId, userId)).getOrElse {
       notInitialized()
     }
   }
 
-  def enable(clientId: String, userId: String): Option[UserAuthorization] = {
-    delegate.map(_.enable(clientId, userId)).getOrElse {
-      notInitialized()
-      None
-    }
-  }
-
+ 
+  
   def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization] = {
     delegate.map(_.findByClientIdAndUser(clientId, userId)).getOrElse {
       notInitialized()

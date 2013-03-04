@@ -45,10 +45,11 @@ class InMemoryScopeService (application: Application) extends ScopeServicePlugin
 class InMemoryUserAuthorizationService(application: Application) extends UserAuthorizationServicePlugin(application) {
 
   private var authotizations = Map[String, UserAuthorization]()
+  private var authzRequests = Map[String, AuthorizationRequest]()
 
   
   def save(authorization: UserAuthorization): UserAuthorization = {
-    authotizations += ( (authorization.clientId + authorization.userId) -> authorization)
+    authotizations += ( (authorization.client_id + authorization.user) -> authorization)
     authorization
   }
 
@@ -60,15 +61,19 @@ class InMemoryUserAuthorizationService(application: Application) extends UserAut
     authotizations -= (clientId + userId)
   }
 
-  def enable(clientId: String, userId: String): Option[UserAuthorization] = {
-    authotizations.get((clientId + userId)) match {
+
+  def saveRequest(authzRequest: AuthorizationRequest): AuthorizationRequest = {
+    authzRequests += (authzRequest.code -> authzRequest)
+    authzRequest
+  }
+  
+  def consumeRequest(requestCode: String): Option[AuthorizationRequest] = {
+    authzRequests.get(requestCode) match {
       case None => None
-      case Some(value) => {
-        val newValue = SimpleUserAuthorization(value.clientId, value.userId, value.verificationCode, value.grantedOn, true)
-        authotizations += ( (newValue.clientId + newValue.userId) -> newValue)
-        Some(newValue)
+      case Some(authzReq) => {
+        authzRequests -= requestCode
+        Some(authzReq)
       }
-      
     }
   }
 

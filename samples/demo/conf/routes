@@ -9,7 +9,7 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET		/auth						com.elogiclab.oauth2.controller.AuthzEndpoint.auth
-POST	/authz						com.elogiclab.oauth2.controller.AuthzEndpoint.authz
+POST	/authz/:authzCode			com.elogiclab.oauth2.controller.AuthzEndpoint.authz(authzCode)
 
 # Login page
 GET     /login                      securesocial.controllers.LoginPage.login
