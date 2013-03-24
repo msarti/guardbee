@@ -1,4 +1,4 @@
-package com.elogiclab.oauth2.utils
+package com.elogiclab.guardbee.utils
 
 import play.Play
 import play.api.mvc.Call

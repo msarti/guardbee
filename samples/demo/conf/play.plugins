@@ -1,8 +1,9 @@
 2000:com.elogiclab.oauth2.controller.DefaultTemplatesPlugin
-2001:services.InMemoryClientIdService
-2002:services.InMemoryScopeService
-2003:services.InMemoryUserAuthorizationService
-2004:services.InMemoryAuthCodeService
+2001:com.elogiclab.oauth2.demo.InMemoryClientAppService
+2002:com.elogiclab.oauth2.demo.InMemoryScopeService
+2003:com.elogiclab.oauth2.demo.InMemoryUserAuthorizationService
+2004:com.elogiclab.oauth2.demo.InMemoryAuthCodeService
+2005:com.elogiclab.oauth2.demo.InMemoryAccessTokenService
 
 1500:com.typesafe.plugin.CommonsMailerPlugin
 9996:securesocial.core.providers.utils.DefaultPasswordValidator

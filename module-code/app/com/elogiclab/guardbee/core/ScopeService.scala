@@ -1,4 +1,4 @@
-package com.elogiclab.oauth2.authz.core
+package com.elogiclab.guardbee.core
 
 import play.api.Logger
 import play.api.Application
@@ -6,6 +6,7 @@ import play.api.Plugin
 
 trait Scope {
   def scope: String
+  def description: String
 }
 
 trait ScopeService {
@@ -17,6 +18,8 @@ trait ScopeService {
   def delete(scope: String): Unit
 
 }
+
+case class SimpleScope(scope: String, description: String) extends Scope
 
 abstract class ScopeServicePlugin(application: Application) extends Plugin with ScopeService {
 

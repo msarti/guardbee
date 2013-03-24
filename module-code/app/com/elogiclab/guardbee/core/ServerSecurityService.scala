@@ -1,4 +1,4 @@
-package com.elogiclab.oauth2.authz.core
+package com.elogiclab.guardbee.core
 
 import play.api.{ Plugin, Logger }
 import play.api.mvc.WrappedRequest

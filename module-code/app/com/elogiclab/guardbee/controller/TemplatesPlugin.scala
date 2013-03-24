@@ -1,15 +1,15 @@
-package com.elogiclab.oauth2.controller
+package com.elogiclab.guardbee.controller
 
 import play.api.Plugin
 import play.api.Logger
 import play.api.mvc.{ RequestHeader, Request }
 import play.api.templates.Html
 import play.api.Application
-import com.elogiclab.oauth2.views.html.authError
+import com.elogiclab.guardbee.views.html.authError
 import play.api.Play.current
 import play.api.data.Form
-import com.elogiclab.oauth2.views.html.authRequestForm
-import com.elogiclab.oauth2.authz.core.ClientIdentity
+import com.elogiclab.guardbee.views.html.authRequestForm
+import com.elogiclab.guardbee.core.ClientApplication
 
 trait TemplatesPlugin extends Plugin {
 
@@ -18,14 +18,14 @@ trait TemplatesPlugin extends Plugin {
   }
 
   def getAuthErrorPage[A](errorKey:String, errorMessage: String)(implicit request: Request[A]): Html
-  def getAuthRequestForm[A](client: ClientIdentity, authzCode: String)(implicit request: Request[A]): Html
+  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[A]): Html
 
 }
 
 class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
 
   def getAuthErrorPage[A](errorKey:String, errorMessage: String)(implicit request: Request[A]): Html = authError(errorKey, errorMessage)
-  def getAuthRequestForm[A](client: ClientIdentity, authzCode: String)(implicit request: Request[A]): Html = authRequestForm(client, authzCode)
+  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[A]): Html = authRequestForm(client, authzCode)
 
 }
 
@@ -40,7 +40,7 @@ object TemplatesHelper {
   def getAuthErrorPage[A](errorKey:String,errorMessage: String)(implicit request: Request[A]): Html = {
     templateAPI.getAuthErrorPage(errorKey, errorMessage)(request)
   }
-  def getAuthRequestForm[A](client: ClientIdentity, authzCode: String)(implicit request: Request[A]): Html = {
+  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[A]): Html = {
     templateAPI.getAuthRequestForm(client, authzCode)(request)
   }
 
