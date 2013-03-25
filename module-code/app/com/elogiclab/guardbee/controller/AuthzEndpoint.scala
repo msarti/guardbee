@@ -9,6 +9,8 @@ import play.api.i18n.Messages
 import java.util.UUID
 import org.joda.time.DateTime
 import com.elogiclab.guardbee.core._
+import com.elogiclab.guardbee.auth.ServerSecurityService
+import com.elogiclab.guardbee.auth.AuthWrappedRequest
 
 case class AuthForm(response_type: String, client_id: ClientApplication, redirect_uri: String, scope: Seq[Scope], state: Option[String], code: Option[String], authorized: Option[String])
 
@@ -43,7 +45,7 @@ object AuthzEndpoint extends Controller {
   def auth = ServerSecurityService.SecuredAction { implicit request =>
  
     def authorizeIfNeeded(form_data: AuthForm): Result = {
-      UserAuthorizationService.findByClientIdAndUser(form_data.client_id.client_id, request.user) match {
+      UserAuthorizationService.findByClientIdAndUser(form_data.client_id.client_id, request.user.username) match {
         case None => // Authorization needed 
           {
             Logger.debug("User " + request.user + " need to authorize app " + form_data.client_id)

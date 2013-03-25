@@ -22,6 +22,7 @@ import play.api.Logger
 import play.api.mvc.AnyContent
 import java.util.UUID
 import org.joda.time.DateTime
+import com.elogiclab.guardbee.auth.AuthWrappedRequest
 
 trait ClientApplication {
   def client_id: String
@@ -94,7 +95,7 @@ object ClientAppService {
     save(SimpleClientApplication(
     		client_id = UUID.randomUUID().toString(),
     		client_secret = UUID.randomUUID().toString(),
-    		owner_user = request.user,
+    		owner_user = request.user.username,
     		app_name = app_name,
     		app_description = app_description,
     		redirect_uris = redirect_uris,

@@ -24,6 +24,7 @@ import play.api.Plugin
 import org.joda.time.DateTime
 import play.api.mvc.AnyContent
 import java.util.UUID
+import com.elogiclab.guardbee.auth.AuthWrappedRequest
 
 trait AuthCode {
   def code: String
@@ -97,7 +98,7 @@ object AuthCodeService {
     import play.api.Play
     save(SimpleAuthCode(
       code = UUID.randomUUID.toString,
-      user = request.user,
+      user = request.user.username,
       redirect_uri = redirect_uri,
       scope = scope,
       issued_on = DateTime.now,

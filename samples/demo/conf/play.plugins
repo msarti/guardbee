@@ -1,9 +1,9 @@
-2000:com.elogiclab.oauth2.controller.DefaultTemplatesPlugin
-2001:com.elogiclab.oauth2.demo.InMemoryClientAppService
-2002:com.elogiclab.oauth2.demo.InMemoryScopeService
-2003:com.elogiclab.oauth2.demo.InMemoryUserAuthorizationService
-2004:com.elogiclab.oauth2.demo.InMemoryAuthCodeService
-2005:com.elogiclab.oauth2.demo.InMemoryAccessTokenService
+2000:com.elogiclab.guardbee.controller.DefaultTemplatesPlugin
+2001:com.elogiclab.guardbee.demo.InMemoryClientAppService
+2002:com.elogiclab.guardbee.demo.InMemoryScopeService
+2003:com.elogiclab.guardbee.demo.InMemoryUserAuthorizationService
+2004:com.elogiclab.guardbee.demo.InMemoryAuthCodeService
+2005:com.elogiclab.guardbee.demo.InMemoryAccessTokenService
 
 1500:com.typesafe.plugin.CommonsMailerPlugin
 9996:securesocial.core.providers.utils.DefaultPasswordValidator
@@ -12,4 +12,4 @@
 9999:securesocial.core.providers.utils.BCryptPasswordHasher
 10004:securesocial.core.providers.UsernamePasswordProvider
 
-10005:com.elogiclab.oauth2.authz.core.SecureSocialWrapperService
+10005:com.elogiclab.guardbee.auth.providers.SecureSocialWrapperService

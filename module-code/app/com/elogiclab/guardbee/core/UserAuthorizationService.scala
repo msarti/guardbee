@@ -22,6 +22,7 @@ import play.api.Application
 import play.api.Plugin
 import play.api.mvc.AnyContent
 import java.util.UUID
+import com.elogiclab.guardbee.auth.AuthWrappedRequest
 
 trait AuthorizationRequest {
   def code: String
@@ -129,7 +130,7 @@ object UserAuthorizationService {
       SimpleAutorizationRequest(
         code = UUID.randomUUID.toString,
         client_id = client_id,
-        user = request.user,
+        user = request.user.username,
         response_type = response_type,
         redirect_uri = redirect_uri,
         scope = scope,
@@ -142,7 +143,7 @@ object UserAuthorizationService {
     save(
       SimpleUserAuthorization(
         client_id = client_id,
-        user = request.user,
+        user = request.user.username,
         scope = scope,
         granted_on = DateTime.now))
   }

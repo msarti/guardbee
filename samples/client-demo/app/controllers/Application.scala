@@ -5,6 +5,7 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import dispatch._
+import play.api.libs.json.Json
 
 case class Login(auth_uri:String, client_id:String, client_secret:String, token_uri: String, scope: String)
 
@@ -61,8 +62,10 @@ object Application extends Controller {
 
     val result = Http(svc OK as.String)
     
-    for (c <- result)
-    	println(c)
+    for (c <- result) {
+    	val json = Json.parse(c)
+    	print(json)
+    }
     
     Ok
   }

@@ -1,16 +1,12 @@
 import play.api._
-import com.elogiclab.oauth2.authz.core.ScopeService
-import com.elogiclab.oauth2.authz.core.Scope
+import com.elogiclab.guardbee.core._
 import securesocial.core.UserService
 import securesocial.core.SocialUser
 import securesocial.core.UserId
 import securesocial.core.AuthenticationMethod
 import securesocial.core.PasswordInfo
-import com.elogiclab.oauth2.authz.core.ClientAppService
-import com.elogiclab.oauth2.authz.core.ClientApplication
-import com.elogiclab.oauth2.authz.core.SimpleClientApplication
+
 import org.joda.time.DateTime
-import com.elogiclab.oauth2.authz.core.SimpleScope
 
 object Global extends GlobalSettings {
 
