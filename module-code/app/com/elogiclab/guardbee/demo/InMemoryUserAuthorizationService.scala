@@ -3,18 +3,18 @@ package com.elogiclab.guardbee.demo
 import com.elogiclab.guardbee.core._
 import play.api.Application
 
-class InMemoryUserAuthorizationService(application: Application) extends UserAuthorizationServicePlugin(application) {
+class InMemoryUserAuthorizationService(application: Application) extends GrantedAuthorizationServicePlugin(application) {
 
-  private var authotizations = Map[String, UserAuthorization]()
+  private var authotizations = Map[String, GrantedAuthorization]()
   private var authzRequests = Map[String, AuthorizationRequest]()
 
   
-  def save(authorization: UserAuthorization): UserAuthorization = {
+  def save(authorization: GrantedAuthorization): GrantedAuthorization = {
     authotizations += ( (authorization.client_id + authorization.user) -> authorization)
     authorization
   }
 
-  def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization] = {
+  def findByClientIdAndUser(clientId: String, userId: String): Option[GrantedAuthorization] = {
     authotizations.get((clientId + userId))
   }
 

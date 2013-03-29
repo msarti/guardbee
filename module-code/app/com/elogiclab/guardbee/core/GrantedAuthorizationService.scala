@@ -49,7 +49,7 @@ case class SimpleAutorizationRequest(
   request_timestamp: DateTime,
   request_expiration: DateTime) extends AuthorizationRequest
 
-trait UserAuthorization {
+trait GrantedAuthorization {
   def client_id: String
   def user: String
   def scope: Seq[Scope]
@@ -60,37 +60,37 @@ case class SimpleUserAuthorization(
   client_id: String,
   user: String,
   scope: Seq[Scope],
-  granted_on: DateTime) extends UserAuthorization
+  granted_on: DateTime) extends GrantedAuthorization
 
-trait UserAuthorizationService {
+trait GrantedAuthorizationService {
 
-  def save(authorization: UserAuthorization): UserAuthorization
+  def save(authorization: GrantedAuthorization): GrantedAuthorization
 
   def saveRequest(authzRequest: AuthorizationRequest): AuthorizationRequest
 
   def consumeRequest(requestCode: String): Option[AuthorizationRequest]
 
-  def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization]
+  def findByClientIdAndUser(clientId: String, userId: String): Option[GrantedAuthorization]
 
   def delete(clientId: String, userId: String): Unit
 
 }
 
-abstract class UserAuthorizationServicePlugin(application: Application) extends Plugin with UserAuthorizationService {
+abstract class GrantedAuthorizationServicePlugin(application: Application) extends Plugin with GrantedAuthorizationService {
   override def onStart() {
-    UserAuthorizationService.setService(this)
+    GrantedAuthorizationService.setService(GrantedAuthorizationServicePlugin.this)
   }
 }
 
-object UserAuthorizationService {
+object GrantedAuthorizationService {
 
-  var delegate: Option[UserAuthorizationService] = None
+  var delegate: Option[GrantedAuthorizationService] = None
 
-  def setService(service: UserAuthorizationService) = {
+  def setService(service: GrantedAuthorizationService) = {
     delegate = Some(service);
   }
 
-  def save(authorization: UserAuthorization): UserAuthorization = {
+  def save(authorization: GrantedAuthorization): GrantedAuthorization = {
     delegate.map(_.save(authorization)).getOrElse {
       notInitialized()
       authorization
@@ -117,7 +117,7 @@ object UserAuthorizationService {
     }
   }
 
-  def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization] = {
+  def findByClientIdAndUser(clientId: String, userId: String): Option[GrantedAuthorization] = {
     delegate.map(_.findByClientIdAndUser(clientId, userId)).getOrElse {
       notInitialized()
       None

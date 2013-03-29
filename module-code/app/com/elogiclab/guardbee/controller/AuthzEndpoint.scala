@@ -45,12 +45,12 @@ object AuthzEndpoint extends Controller {
   def auth = ServerSecurityService.SecuredAction { implicit request =>
  
     def authorizeIfNeeded(form_data: AuthForm): Result = {
-      UserAuthorizationService.findByClientIdAndUser(form_data.client_id.client_id, request.user.username) match {
+      GrantedAuthorizationService.findByClientIdAndUser(form_data.client_id.client_id, request.user.username) match {
         case None => // Authorization needed 
           {
             Logger.debug("User " + request.user + " need to authorize app " + form_data.client_id)
             val authzRequest =
-            UserAuthorizationService.makeUserAuthRequest(
+            GrantedAuthorizationService.makeUserAuthRequest(
                 form_data.client_id.client_id, form_data.response_type, form_data.redirect_uri, form_data.scope, form_data.state)
             
             Logger.debug("Created new authorization request: " + authzRequest)
@@ -79,7 +79,7 @@ object AuthzEndpoint extends Controller {
 
   def authz(autzCode: String) = ServerSecurityService.SecuredAction { implicit request =>
     
-    UserAuthorizationService.consumeRequest(autzCode) match {
+    GrantedAuthorizationService.consumeRequest(autzCode) match {
       case None => {
           Logger.error("Authorization request not found")
           BadRequest(TemplatesHelper.getAuthErrorPage("authorization", "guardbee.error.authorization_request_notfound")(request))
@@ -88,7 +88,7 @@ object AuthzEndpoint extends Controller {
     	  (authzReq.user, authzReq.isExpired) match {
     	    case (request.user, false) => {
     	    	Logger.info("Creating authorization for user "+authzReq.user+" client_id "+authzReq.client_id)
-    	    	UserAuthorizationService.grantAuthorization(authzReq.client_id, authzReq.scope)
+    	    	GrantedAuthorizationService.grantAuthorization(authzReq.client_id, authzReq.scope)
 	            sendAuthCode(authzReq.redirect_uri, authzReq.scope, authzReq.state)
     	    }
     	    case _ => {
