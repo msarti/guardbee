@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import java.util.UUID
 import org.joda.time.DateTime
 import com.elogiclab.guardbee.auth.AuthWrappedRequest
+import com.elogiclab.guardbee.model.SimpleClientApplication
 
 trait ClientApplication {
   def client_id: String
@@ -34,14 +35,6 @@ trait ClientApplication {
   def issued_on: DateTime
 }
 
-case class SimpleClientApplication(
-    client_id: String, 
-    client_secret: String, 
-    owner_user: String,
-    app_name: String, 
-    app_description: Option[String], 
-    redirect_uris: Seq[String],
-    issued_on: DateTime) extends ClientApplication
 
 trait ClientAppService {
   

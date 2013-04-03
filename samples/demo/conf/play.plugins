@@ -1,9 +1,9 @@
 2000:com.elogiclab.guardbee.controller.DefaultTemplatesPlugin
-2001:com.elogiclab.guardbee.demo.InMemoryClientAppService
-2002:com.elogiclab.guardbee.demo.InMemoryScopeService
-2003:com.elogiclab.guardbee.demo.InMemoryUserAuthorizationService
-2004:com.elogiclab.guardbee.demo.InMemoryAuthCodeService
-2005:com.elogiclab.guardbee.demo.InMemoryAccessTokenService
+2001:com.elogiclab.guardbee.service.DefaultClientAppService
+2002:com.elogiclab.guardbee.service.DefaultScopeService
+2003:com.elogiclab.guardbee.service.DefaultUserGrantService
+2004:com.elogiclab.guardbee.service.DefaultAuthCodeService
+2005:com.elogiclab.guardbee.service.DefaultAccessTokenService
 
 1500:com.typesafe.plugin.CommonsMailerPlugin
 9996:securesocial.core.providers.utils.DefaultPasswordValidator

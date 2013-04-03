@@ -23,6 +23,8 @@ import play.api.Plugin
 import play.api.mvc.AnyContent
 import java.util.UUID
 import com.elogiclab.guardbee.auth.AuthWrappedRequest
+import com.elogiclab.guardbee.model.SimpleAutorizationRequest
+import com.elogiclab.guardbee.model.SimpleUserGrant
 
 trait AuthorizationRequest {
   def code: String
@@ -38,59 +40,44 @@ trait AuthorizationRequest {
   def isExpired = DateTime.now isAfter request_expiration
 }
 
-case class SimpleAutorizationRequest(
-  code: String,
-  client_id: String,
-  user: String,
-  response_type: String,
-  redirect_uri: String,
-  scope: Seq[Scope],
-  state: Option[String],
-  request_timestamp: DateTime,
-  request_expiration: DateTime) extends AuthorizationRequest
 
-trait UserAuthorization {
+trait UserGrant {
   def client_id: String
   def user: String
   def scope: Seq[Scope]
   def granted_on: DateTime
 }
 
-case class SimpleUserAuthorization(
-  client_id: String,
-  user: String,
-  scope: Seq[Scope],
-  granted_on: DateTime) extends UserAuthorization
 
-trait UserAuthorizationService {
+trait UserGrantService {
 
-  def save(authorization: UserAuthorization): UserAuthorization
+  def save(authorization: UserGrant): UserGrant
 
   def saveRequest(authzRequest: AuthorizationRequest): AuthorizationRequest
 
   def consumeRequest(requestCode: String): Option[AuthorizationRequest]
 
-  def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization]
+  def findByClientIdAndUser(clientId: String, userId: String): Option[UserGrant]
 
   def delete(clientId: String, userId: String): Unit
 
 }
 
-abstract class UserAuthorizationServicePlugin(application: Application) extends Plugin with UserAuthorizationService {
+abstract class UserGrantServicePlugin(application: Application) extends Plugin with UserGrantService {
   override def onStart() {
-    UserAuthorizationService.setService(this)
+    UserGrantService.setService(UserGrantServicePlugin.this)
   }
 }
 
-object UserAuthorizationService {
+object UserGrantService {
 
-  var delegate: Option[UserAuthorizationService] = None
+  var delegate: Option[UserGrantService] = None
 
-  def setService(service: UserAuthorizationService) = {
+  def setService(service: UserGrantService) = {
     delegate = Some(service);
   }
 
-  def save(authorization: UserAuthorization): UserAuthorization = {
+  def save(authorization: UserGrant): UserGrant = {
     delegate.map(_.save(authorization)).getOrElse {
       notInitialized()
       authorization
@@ -117,7 +104,7 @@ object UserAuthorizationService {
     }
   }
 
-  def findByClientIdAndUser(clientId: String, userId: String): Option[UserAuthorization] = {
+  def findByClientIdAndUser(clientId: String, userId: String): Option[UserGrant] = {
     delegate.map(_.findByClientIdAndUser(clientId, userId)).getOrElse {
       notInitialized()
       None
@@ -141,7 +128,7 @@ object UserAuthorizationService {
 
   def grantAuthorization(client_id: String, scope: Seq[Scope])(implicit request: AuthWrappedRequest[AnyContent]) = {
     save(
-      SimpleUserAuthorization(
+      SimpleUserGrant(
         client_id = client_id,
         user = request.user.username,
         scope = scope,

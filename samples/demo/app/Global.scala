@@ -5,8 +5,9 @@ import securesocial.core.SocialUser
 import securesocial.core.UserId
 import securesocial.core.AuthenticationMethod
 import securesocial.core.PasswordInfo
-
 import org.joda.time.DateTime
+import com.elogiclab.guardbee.model.SimpleClientApplication
+import com.elogiclab.guardbee.model.SimpleScope
 
 object Global extends GlobalSettings {
 
