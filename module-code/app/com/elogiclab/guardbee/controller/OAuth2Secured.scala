@@ -135,8 +135,8 @@ def findUser(user_id: String): Option[U]
 
   }
 
-  def getAutorization[A](access_token: AccessToken, scope: String)(implicit request: Request[A]): Either[PlainResult, UserAuthorization] = {
-    val authorization = UserAuthorizationService.findByClientIdAndUser(access_token.client_id, access_token.user)
+  def getAutorization[A](access_token: AccessToken, scope: String)(implicit request: Request[A]): Either[PlainResult, UserGrant] = {
+    val authorization = UserGrantService.findByClientIdAndUser(access_token.client_id, access_token.user)
     authorization match {
       case None => Left(UNAUTHORIZED)
       case Some(auth) => {
