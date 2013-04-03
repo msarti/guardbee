@@ -35,7 +35,6 @@ trait ScopeService {
 
 }
 
-case class SimpleScope(scope: String, description: String) extends Scope
 
 abstract class ScopeServicePlugin(application: Application) extends Plugin with ScopeService {
 

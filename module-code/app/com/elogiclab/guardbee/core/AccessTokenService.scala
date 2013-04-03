@@ -23,6 +23,7 @@ import org.joda.time.DateTime
 import org.joda.time.Seconds
 import play.api.mvc.AnyContent
 import java.util.UUID
+import com.elogiclab.guardbee.model._
 
 trait AccessToken {
   def token: String
@@ -46,15 +47,6 @@ trait AccessToken {
  //     "refresh_token" -> refresh_token)
 }
 
-case class SimpleAccessToken(token: String,
-  refresh_token: String,
-  token_type: String,
-  user: String,
-  client_id: String,
-  scope: Seq[Scope],
-  issued_on: DateTime,
-  token_expiration: DateTime,
-  refresh_token_expiration: DateTime) extends AccessToken
 
 trait AccessTokenService {
   def save(token: AccessToken): AccessToken
