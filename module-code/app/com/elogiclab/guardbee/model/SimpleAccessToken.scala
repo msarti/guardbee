@@ -87,6 +87,18 @@ object SimpleAccessToken {
     }
   }
   
+  def findByRefreshToken(refresh_token: String): Option[AccessToken] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+      """
+          select access_token.* from access_token
+          where access_token.refresh_token = {refresh_token}
+      """
+      ).on('refresh_token -> refresh_token).as(SimpleAccessToken.simple.singleOpt)
+    }
+  }
+
+  
   def getScope(token: String ):Seq[Scope] = {
     DB.withConnection { implicit connection =>
       SQL(

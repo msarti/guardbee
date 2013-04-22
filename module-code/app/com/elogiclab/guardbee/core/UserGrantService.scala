@@ -134,6 +134,14 @@ object UserGrantService {
         scope = scope,
         granted_on = DateTime.now))
   }
+  
+  def isAppGranted(clientId: String, user: String): Boolean = {
+    findByClientIdAndUser(clientId, user) match {
+      case None => false
+      case _ => true
+    }
+  }
+  
 
   private def notInitialized() {
     Logger.error("UserAuthorizationService was not initialized. Make sure a UserAuthorizationService plugin is specified in your play.plugins file")

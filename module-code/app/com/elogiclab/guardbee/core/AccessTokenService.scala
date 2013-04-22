@@ -24,6 +24,8 @@ import org.joda.time.Seconds
 import play.api.mvc.AnyContent
 import java.util.UUID
 import com.elogiclab.guardbee.model._
+import com.elogiclab.guardbee.auth._
+import com.elogiclab.guardbee.auth.OauthError._
 
 trait AccessToken {
   def token: String
@@ -52,6 +54,7 @@ trait AccessTokenService {
   def save(token: AccessToken): AccessToken
   def delete(token: String): Unit
   def findByToken(token: String): Option[AccessToken]
+  def findByRefreshToken(refresh_token: String): Option[AccessToken]
 
 }
 
@@ -82,6 +85,25 @@ object AccessTokenService {
       None
     }
   }
+  def findByRefreshToken(refresh_token: String, validate: Boolean = true): Either[AccessToken, OauthError] = {
+    delegate.map(_.findByRefreshToken(refresh_token)).getOrElse {
+      notInitialized()
+      None
+    } match {
+      case None => Right(INVALID_REFRESH_TOKEN)
+      case Some(token) => if(validate && token.isRefreshTokenExpired) Right(EXPIRED_REFRESH_TOKEN) else Left(token)
+    } 
+  }
+  
+  def refreshToken(refresh_token: String):Either[AccessToken, OauthError] = {
+    findByRefreshToken(refresh_token).fold(
+        token => {
+          delete(token.token) 
+          val new_token = issueToken(token.user, token.client_id, token.scope)
+          Left(new_token)
+        },
+        error => Right(error) )
+  }
 
   def delete(token: String): Unit = {
     delegate.map(_.delete(token)).getOrElse {
@@ -104,6 +126,19 @@ object AccessTokenService {
         refresh_token_expiration = DateTime.now.plusDays(Play.current.configuration.getInt("guardbee.refresh_token.duration_days").getOrElse(30))))
 
   }
+  
+  
+  def revokeToken(token: String): Boolean = {
+    findByToken(token) match {
+      case None => false
+      case _ => {
+        delete(token)
+        true
+      }
+    }
+  }
+  
+  
 
   private def notInitialized() {
     Logger.error("AuthCodeService was not initialized. Make sure a AuthCodeService plugin is specified in your play.plugins file")

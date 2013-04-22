@@ -11,10 +11,11 @@ import org.joda.time.DateTime
 import com.elogiclab.guardbee.core._
 import com.elogiclab.guardbee.auth.ServerSecurityService
 import com.elogiclab.guardbee.auth.AuthWrappedRequest
+import com.elogiclab.guardbee.auth.OauthError
 
 case class AuthForm(response_type: String, client_id: ClientApplication, redirect_uri: String, scope: Seq[Scope], state: Option[String], code: Option[String], authorized: Option[String])
 
-object AuthzEndpoint extends Controller {
+object AuthzEndpoint extends Controller with Oauth2Endpoint {
 
   
   val loginForm = Form(
@@ -71,7 +72,7 @@ object AuthzEndpoint extends Controller {
       formWithErrors => //Validation errors
         {
           Logger.info("There are errors in request: " + formWithErrors)
-          BadRequest(TemplatesHelper.getAuthErrorPage(formWithErrors.errors.head.key, formWithErrors.errors.head.message)(request))
+          OauthError(error = formWithErrors.errors.head.key, description = formWithErrors.errors.head.message).toErrorPageResponse
         },
 
       value => authorizeIfNeeded(value))
@@ -82,7 +83,7 @@ object AuthzEndpoint extends Controller {
     UserGrantService.consumeRequest(autzCode) match {
       case None => {
           Logger.error("Authorization request not found")
-          BadRequest(TemplatesHelper.getAuthErrorPage("authorization", "guardbee.error.authorization_request_notfound")(request))
+          OauthError(error = "authorization", description = "guardbee.error.authorization_request_notfound").toErrorPageResponse
       }
       case Some(authzReq) => {
     	  (authzReq.user, authzReq.isExpired) match {
@@ -93,7 +94,7 @@ object AuthzEndpoint extends Controller {
     	    }
     	    case _ => {
 	          Logger.error("Authorization request is not valid: isExpired = "+authzReq.isExpired+" user = "+authzReq.user+" (actual user = "+request.user+")")
-	          BadRequest(TemplatesHelper.getAuthErrorPage("authorization", "guardbee.error.authorization_request_invalid")(request))
+	          OauthError(error = "authorization", description = "guardbee.error.authorization_request_invalid").toErrorPageResponse
     	    }
     	  }
       }

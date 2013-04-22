@@ -13,4 +13,5 @@ class DefaultAccessTokenService(application: Application) extends AccessTokenSer
 
   def findByToken(token: String): Option[AccessToken] = SimpleAccessToken.findByToken(token)
 
+  def findByRefreshToken(refresh_token: String): Option[AccessToken] = SimpleAccessToken.findByRefreshToken(refresh_token)
 }

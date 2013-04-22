@@ -11,6 +11,7 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET		/auth						com.elogiclab.guardbee.controller.AuthzEndpoint.auth
 POST	/authz/:authzCode			com.elogiclab.guardbee.controller.AuthzEndpoint.authz(authzCode)
 POST	/token						com.elogiclab.guardbee.controller.TokenEndpoint.token
+GET		/revoke						com.elogiclab.guardbee.controller.TokenEndpoint.revoke(token: String)
 
 # Login page
 GET     /login                      securesocial.controllers.LoginPage.login

@@ -13,14 +13,20 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     Logger.info("Application has started")
-    
-    ClientAppService.save(SimpleClientApplication("test_client_id", "secret", "test@example.com" ,"Application Name", Some("Description"), Seq("http://192.168.1.66:9001/code"), DateTime.now))
-    
-    ScopeService.save(SimpleScope("get_profile", "Read the user profile"))
-    UserService.save(SocialUser(UserId("test@example.com", "userpass"), 
-        "First name", "Last Name", "full name", Some("test@example.com"), None, 
-        AuthenticationMethod("userPassword"), None, None, Some(PasswordInfo("bcrypt", "$2a$10$4fWy7qVyH.gcjSc95t4qGeorEshJTDpuyYAl2BlhgRhWji7UIXbSC"))
-        ) )
+
+    ClientAppService.findByClientId("test_client_id").getOrElse {
+      ClientAppService.save(SimpleClientApplication("test_client_id", "secret", "test@example.com", "Application Name", Some("Description"), Seq("http://192.168.1.66:9001/code"), DateTime.now))
+    }
+    ScopeService.findByCode("get_profile").getOrElse {
+      ScopeService.save(SimpleScope("get_profile", "Read the user profile"))
+    }
+
+    UserService.findByEmailAndProvider("test@example.com", "userpass").getOrElse {
+
+      UserService.save(SocialUser(UserId("test@example.com", "userpass"),
+        "First name", "Last Name", "full name", Some("test@example.com"), None,
+        AuthenticationMethod("userPassword"), None, None, Some(PasswordInfo("bcrypt", "$2a$10$4fWy7qVyH.gcjSc95t4qGeorEshJTDpuyYAl2BlhgRhWji7UIXbSC"))))
+    }
   }
 
 }
