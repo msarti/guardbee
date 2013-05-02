@@ -17,10 +17,12 @@
 package com.elogiclab.guardbee.auth.providers
 
 import com.elogiclab.guardbee.auth.UserAuthorization
+
 import securesocial.core.Authorization
 import securesocial.core.Identity
 import com.elogiclab.guardbee.auth.UserAccount
+import SecureSocialImplicits._
 
 case class SecureSocialWrappedAuthorization(authorization:UserAuthorization) extends Authorization {
-  def isAuthorized(user: Identity): Boolean = authorization.isAuthorized(UserAccount(username = user.id.id, firstName = user.firstName, lastName = user.lastName, avatarUrl = user.avatarUrl))
+  def isAuthorized(user: Identity): Boolean = authorization.isAuthorized(user.toUserAccount)
 }

@@ -9,6 +9,7 @@ import anorm.SqlParser._
 import java.util.Date
 import org.joda.time.DateTimeZone
 import play.api.Play.current
+import play.api.Logger
 
 case class SimpleAutorizationRequest(
   code: String,
@@ -39,6 +40,7 @@ object SimpleAutorizationRequest {
 
   def create(req: AuthorizationRequest): AuthorizationRequest = {
     DB.withTransaction { implicit connection =>
+      Logger.debug("Creating new authorization request: "+req)
       SQL(
         """
            insert into authorization_request (
@@ -58,7 +60,7 @@ object SimpleAutorizationRequest {
 
       req.scope.foreach {
         scope =>
-          SQL("insert into auth_request_scope (code, scope) values ({code}, {scope})").on('code -> req.code, 'scope -> scope.scope)
+          SQL("insert into auth_request_scope (code, scope) values ({code}, {scope})").on('code -> req.code, 'scope -> scope.scope).executeUpdate
       }
       req
     }
@@ -73,8 +75,9 @@ object SimpleAutorizationRequest {
           where authorization_request.code = {code}
       """).on('code -> code).as(SimpleAutorizationRequest.simple.singleOpt) match {
           case Some(req) => {
-            SQL("delete from authorization_request where code = {code}").on('code -> code).executeUpdate()
-            Some(req)
+            val result = req.copy(scope = getScope(code))
+            
+            Some(req.copy(scope = getScope(code)))
           }
           case None => None
         }

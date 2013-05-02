@@ -1,5 +1,5 @@
 
-@(errorKey:String, errorMessage: String)(implicit request: RequestHeader)
+@(errorKey:String, errorMessage: String)(implicit request: Request[AnyContent])
 
 @main(Messages("securesocial.notAuthorized.title")) {
     <div class="page-header">

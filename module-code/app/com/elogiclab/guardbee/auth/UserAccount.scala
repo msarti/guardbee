@@ -22,4 +22,16 @@ package com.elogiclab.guardbee.auth
  * @author marco
  *
  */
-case class UserAccount( username: String, firstName:String, lastName:String, avatarUrl:Option[String])
+trait UserAccount {
+	def username: String 
+	def firstName:String 
+	def lastName:String
+	def avatarUrl:Option[String]
+}
+
+case class SimpleUserAccount(
+	username: String,
+	firstName:String, 
+	lastName:String,
+	avatarUrl:Option[String]
+) extends UserAccount

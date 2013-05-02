@@ -9,11 +9,12 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-      "guardbee" % "guardbee_2.9.1" % "master"
+      "guardbee" %% "guardbee" % "master"
     )
 
-    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-      // Add your own project settings here      
+    val main = play.Project(appName, appVersion, appDependencies).settings(
+      resolvers ++= Seq(Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns),
+      		    "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/")
     )
 
 }

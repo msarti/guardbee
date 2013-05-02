@@ -22,7 +22,7 @@ trait TokenEndpoint extends Oauth2Endpoint {
   this: Controller =>
 
   implicit object AccessTokenFormat extends Format[AccessToken] {
-    def reads(json: JsValue): AccessToken = null
+    def reads(json: JsValue): JsResult[AccessToken] = null
     def writes(token: AccessToken): JsValue = JsObject(List("access_token" -> JsString(token.token),
       "token_type" -> JsString(token.token_type),
       "expires_in" -> JsNumber(Seconds.secondsBetween(DateTime.now, token.token_expiration).getSeconds),
@@ -54,7 +54,10 @@ trait TokenEndpoint extends Oauth2Endpoint {
 
         })
         .verifying("guardbee.error.missing_refresh_token", v => {
-          v.grant_type == "refresh_token" && v.refresh_token.isEmpty
+          (v.grant_type, v.refresh_token) match {
+            case ("refresh_token", None) => false
+            case _ => true
+          }
         })
         .verifying("guardbee.error.unauthorized_client_id", v => UserGrantService.isAppGranted(v.client_id.client_id, v.code.user)))
 

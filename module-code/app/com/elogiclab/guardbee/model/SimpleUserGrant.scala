@@ -9,6 +9,7 @@ import anorm.SqlParser._
 import java.util.Date
 import org.joda.time.DateTimeZone
 import play.api.Play.current
+import play.api.Logger
 
 case class SimpleUserGrant(client_id: String,
   user: String,
@@ -28,6 +29,7 @@ object SimpleUserGrant {
 
   def create(grant: UserGrant): UserGrant = {
     DB.withTransaction { implicit connection =>
+      Logger.debug("Saving user grant: "+grant)
       SQL(
         """
            insert into user_grant (
@@ -41,8 +43,9 @@ object SimpleUserGrant {
           'granted_on -> grant.granted_on.toDate).executeUpdate()
 
       grant.scope.foreach {
-        scope =>
-          SQL("insert into user_grant_scope (client_id, user, scope) values ({client_id}, {user}, {scope})").on('client_id -> grant.client_id, 'user -> grant.user, 'scope -> scope.scope)
+        scope => {
+          SQL("insert into user_grant_scope (client_id, user, scope) values ({client_id}, {user}, {scope})").on('client_id -> grant.client_id, 'user -> grant.user, 'scope -> scope.scope).executeUpdate
+        }
       }
       grant
     }
@@ -58,7 +61,11 @@ object SimpleUserGrant {
 
   def findByClientIdAndUser(client_id: String, user: String): Option[UserGrant] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from user_grant where client_id = {client_id} and user = {user}").on('client_id -> client_id, 'user -> user).as(SimpleUserGrant.simple.singleOpt)
+      val result = SQL("select * from user_grant where client_id = {client_id} and user = {user}").on('client_id -> client_id, 'user -> user).as(SimpleUserGrant.simple.singleOpt)
+      result match {
+        case None => None
+      	case Some(grant) => Some(grant.copy(scope = getScope(client_id, user)))
+      }
     }
   }
 

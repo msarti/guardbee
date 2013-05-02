@@ -30,11 +30,12 @@ trait ServerSecurityService extends Plugin {
 
   override def onStart() {
     ServerSecurityService.setService(this)
-    Logger.info("Starting ServerAuthService instance: %s".format(getClass.getName))
+    Logger.info("[guardbee] Starting ServerAuthService instance: %s".format(getClass.getName))
   }
-
   
   def SecuredAction(f: AuthWrappedRequest[AnyContent] => Result): Action[AnyContent]
+  
+  def getAuthenticatedUser[A](implicit request: Request[A]): Option[UserAccount]	
 
 }
 
@@ -51,6 +52,14 @@ object ServerSecurityService {
       notInitialized()
       null
     }
+  }
+  
+  def getAuthenticatedUser(implicit request: Request[AnyContent]): Option[UserAccount] = {
+    delegate.map(_.getAuthenticatedUser).getOrElse {
+      notInitialized()
+      None
+    }
+    
   }
 
   private def notInitialized() {

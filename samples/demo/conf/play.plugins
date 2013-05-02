@@ -4,11 +4,13 @@
 2003:com.elogiclab.guardbee.service.DefaultUserGrantService
 2004:com.elogiclab.guardbee.service.DefaultAuthCodeService
 2005:com.elogiclab.guardbee.service.DefaultAccessTokenService
+2005:com.elogiclab.guardbee.service.DefaultUserService
 
 1500:com.typesafe.plugin.CommonsMailerPlugin
+9995:securesocial.core.DefaultAuthenticatorStore
 9996:securesocial.core.providers.utils.DefaultPasswordValidator
 9997:securesocial.controllers.DefaultTemplatesPlugin
-9998:services.InMemoryUserService
+9998:securesocial.core.DefaultIdGenerator
 9999:securesocial.core.providers.utils.BCryptPasswordHasher
 10004:securesocial.core.providers.UsernamePasswordProvider
 

@@ -8,12 +8,15 @@ object ApplicationBuild extends Build {
     val appVersion      = "master"
 
     val appDependencies = Seq(
-      "securesocial" % "securesocial_2.9.1" % "2.0.8",
-      "joda-time" % "joda-time" % "2.1"
+      "securesocial" %% "securesocial" % "master-SNAPSHOT",
+      "joda-time" % "joda-time" % "2.1",
+      jdbc, anorm
     )
 
-    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-      resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/releases/"))(Resolver.ivyStylePatterns)      
+    val main = play.Project(appName, appVersion, appDependencies).settings(
+      
+      resolvers ++= Seq(Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns),
+      		    "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/")
     )
 
 }

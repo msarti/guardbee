@@ -10,6 +10,7 @@ import play.api.Play.current
 import play.api.data.Form
 import com.elogiclab.guardbee.views.html.authRequestForm
 import com.elogiclab.guardbee.core.ClientApplication
+import play.api.mvc.AnyContent
 
 trait TemplatesPlugin extends Plugin {
 
@@ -17,15 +18,15 @@ trait TemplatesPlugin extends Plugin {
     Logger.info("[play2-oauth] loaded templates plugin: %s".format(getClass.getName))
   }
 
-  def getAuthErrorPage[A](errorKey:String, errorMessage: String)(implicit request: Request[A]): Html
-  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[A]): Html
+  def getAuthErrorPage(errorKey:String, errorMessage: String)(implicit request: Request[AnyContent]): Html
+  def getAuthRequestForm(client: ClientApplication, authzCode: String)(implicit request: Request[AnyContent]): Html
 
 }
 
 class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
 
-  def getAuthErrorPage[A](errorKey:String, errorMessage: String)(implicit request: Request[A]): Html = authError(errorKey, errorMessage)
-  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[A]): Html = authRequestForm(client, authzCode)
+  def getAuthErrorPage(errorKey:String, errorMessage: String)(implicit request: Request[AnyContent]): Html = authError(errorKey, errorMessage)(request)
+  def getAuthRequestForm(client: ClientApplication, authzCode: String)(implicit request: Request[AnyContent]): Html = authRequestForm(client, authzCode)
 
 }
 
@@ -37,10 +38,10 @@ object TemplatesHelper {
     }
   }
   
-  def getAuthErrorPage[A](errorKey:String,errorMessage: String)(implicit request: Request[A]): Html = {
+  def getAuthErrorPage[A](errorKey:String,errorMessage: String)(implicit request: Request[AnyContent]): Html = {
     templateAPI.getAuthErrorPage(errorKey, errorMessage)(request)
   }
-  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[A]): Html = {
+  def getAuthRequestForm[A](client: ClientApplication, authzCode: String)(implicit request: Request[AnyContent]): Html = {
     templateAPI.getAuthRequestForm(client, authzCode)(request)
   }
 

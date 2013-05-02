@@ -17,7 +17,6 @@ case class AuthForm(response_type: String, client_id: ClientApplication, redirec
 
 object AuthzEndpoint extends Controller with Oauth2Endpoint {
 
-  
   val loginForm = Form(
     mapping(
       "response_type" -> text.verifying("guardbee.error.invalid_response_type", rt => rt == "code"),
@@ -44,25 +43,25 @@ object AuthzEndpoint extends Controller with Oauth2Endpoint {
   }
 
   def auth = ServerSecurityService.SecuredAction { implicit request =>
- 
+
     def authorizeIfNeeded(form_data: AuthForm): Result = {
       UserGrantService.findByClientIdAndUser(form_data.client_id.client_id, request.user.username) match {
         case None => // Authorization needed 
           {
             Logger.debug("User " + request.user + " need to authorize app " + form_data.client_id)
             val authzRequest =
-            UserGrantService.makeUserAuthRequest(
+              UserGrantService.makeUserAuthRequest(
                 form_data.client_id.client_id, form_data.response_type, form_data.redirect_uri, form_data.scope, form_data.state)
-            
+
             Logger.debug("Created new authorization request: " + authzRequest)
             Ok(TemplatesHelper.getAuthRequestForm(form_data.client_id, authzRequest.code))
           }
         case Some(auth) =>
           {
-             //We don't need authotization
-              Logger.debug("Authorization found for " + form_data.client_id + " - " + auth)
-              Logger.info("Redirect to %s ".format(form_data.redirect_uri))
-              sendAuthCode(form_data.redirect_uri, form_data.scope, form_data.state)
+            //We don't need authotization
+            Logger.debug("Authorization found for " + form_data.client_id + " - " + auth)
+            Logger.info("Redirect to %s ".format(form_data.redirect_uri))
+            sendAuthCode(form_data.redirect_uri, form_data.scope, form_data.state)
           }
       }
 
@@ -79,24 +78,25 @@ object AuthzEndpoint extends Controller with Oauth2Endpoint {
   }
 
   def authz(autzCode: String) = ServerSecurityService.SecuredAction { implicit request =>
-    
+
+    val username = request.user.username
     UserGrantService.consumeRequest(autzCode) match {
       case None => {
-          Logger.error("Authorization request not found")
-          OauthError(error = "authorization", description = "guardbee.error.authorization_request_notfound").toErrorPageResponse
+        Logger.error("Authorization request not found")
+        OauthError(error = "authorization", description = "guardbee.error.authorization_request_notfound").toErrorPageResponse
       }
       case Some(authzReq) => {
-    	  (authzReq.user, authzReq.isExpired) match {
-    	    case (request.user.username, false) => {
-    	    	Logger.info("Creating authorization for user "+authzReq.user+" client_id "+authzReq.client_id)
-    	    	UserGrantService.grantAuthorization(authzReq.client_id, authzReq.scope)
-	            sendAuthCode(authzReq.redirect_uri, authzReq.scope, authzReq.state)
-    	    }
-    	    case _ => {
-	          Logger.error("Authorization request is not valid: isExpired = "+authzReq.isExpired+" user = "+authzReq.user+" (actual user = "+request.user+")")
-	          OauthError(error = "authorization", description = "guardbee.error.authorization_request_invalid").toErrorPageResponse
-    	    }
-    	  }
+        (authzReq.user, authzReq.isExpired) match {
+          case (username, false) => {
+            Logger.info("Creating authorization for user " + authzReq.user + " client_id " + authzReq.client_id)
+            UserGrantService.grantAuthorization(authzReq.client_id, authzReq.scope)
+            sendAuthCode(authzReq.redirect_uri, authzReq.scope, authzReq.state)
+          }
+          case _ => {
+            Logger.error("Authorization request is not valid: isExpired = " + authzReq.isExpired + " user = " + authzReq.user + " (actual user = " + request.user + ")")
+            OauthError(error = "authorization", description = "guardbee.error.authorization_request_invalid").toErrorPageResponse
+          }
+        }
       }
     }
   }

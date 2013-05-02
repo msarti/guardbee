@@ -12,8 +12,9 @@ object ApplicationBuild extends Build {
         "net.databinder.dispatch" %% "dispatch-core" % "0.9.5"
     )
 
-    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-      // Add your own project settings here      
+    val main = play.Project(appName, appVersion, appDependencies).settings(
+      // Add your own project settings here   
+        //scalaVersion := "2.9.1"
     )
 
 }

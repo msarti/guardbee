@@ -1,5 +1,5 @@
 
-@(client: com.elogiclab.guardbee.core.ClientApplication, authzCode: String)(implicit request: RequestHeader)
+@(client: com.elogiclab.guardbee.core.ClientApplication, authzCode: String)(implicit request: Request[AnyContent])
 
 @main(Messages("guardbee.authRequestForm.title")) {
     <div class="page-header">

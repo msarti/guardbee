@@ -25,23 +25,35 @@ import com.elogiclab.guardbee.auth.UserAccount
 import securesocial.core.Identity
 import com.elogiclab.guardbee.auth.UserAccount
 import com.elogiclab.guardbee.auth.UserAuthorization
+import securesocial.core.SecureSocial
+import com.elogiclab.guardbee.auth.SimpleUserAccount
+import SecureSocialImplicits._
+
 
 trait SecureSocialUserAccount extends UserAccount with Identity
 
 class SecureSocialWrapperService(application: Application) extends ServerSecurityService {
 
-  
+
   object provider extends securesocial.core.SecureSocial
-  
+
   def SecuredAction(f: AuthWrappedRequest[AnyContent] => Result): Action[AnyContent] = provider.SecuredAction {
-    implicit request => 
-    f(AuthWrappedRequest(UserAccount(username = request.user.id.id, firstName = request.user.firstName, lastName = request.user.lastName, avatarUrl = request.user.avatarUrl), request))
+    implicit request =>
+      f(AuthWrappedRequest(request.user.toUserAccount, request))
   }
-  
-  
+
   def SecuredAction(authorization: UserAuthorization)(f: AuthWrappedRequest[AnyContent] => Result): Action[AnyContent] = provider.SecuredAction(false, new SecureSocialWrappedAuthorization(authorization)) {
-    implicit request => 
-    f(AuthWrappedRequest(UserAccount(username = request.user.id.id, firstName = request.user.firstName, lastName = request.user.lastName, avatarUrl = request.user.avatarUrl), request))
+    implicit request =>
+      f(AuthWrappedRequest(request.user.toUserAccount, request))
+  }
+
+  def getAuthenticatedUser[A](implicit request: Request[A]): Option[UserAccount] = {
+    SecureSocial.currentUser match {
+      case None => None
+      case Some(identity) => Some(identity.toUserAccount)
+
+    }
+
   }
 
 }

@@ -15,7 +15,7 @@ object Global extends GlobalSettings {
     Logger.info("Application has started")
 
     ClientAppService.findByClientId("test_client_id").getOrElse {
-      ClientAppService.save(SimpleClientApplication("test_client_id", "secret", "test@example.com", "Application Name", Some("Description"), Seq("http://192.168.1.66:9001/code"), DateTime.now))
+      ClientAppService.save(SimpleClientApplication("test_client_id", "secret", "test@example.com", "Application Name", Some("Description"), Seq("http://192.168.1.65:9001/code"), DateTime.now))
     }
     ScopeService.findByCode("get_profile").getOrElse {
       ScopeService.save(SimpleScope("get_profile", "Read the user profile"))
