@@ -1,0 +1,54 @@
+@()
+<li class="dropdown">
+	<a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
+	<div class="dropdown-menu" style="padding: 15px; padding-bottom: 0px;">
+		<script type="text/javascript">
+		$(document).ready(function(){
+			 $('#login-form').validate({
+				 rules: {
+					 username: {
+						 required: true,
+						 email: true
+					 },
+					 password: {
+						 required: true
+				     }
+				 },
+				 highlight: function(element) {
+					 $(element).closest('.control-group').removeClass('success').addClass('error');
+				 },
+				 success: function(element) {
+					 element.addClass('valid').closest('.control-group').removeClass('error').addClass('success');
+				 },
+				 submitHandler: function(form) {
+					 $.post('/login', $('#login-form').serialize(), function(data) {
+						// if(data.status == "OK") {
+						 	window.location.replace(data.toUrl);
+						 //} else {
+ 						 //   $('#login-error').addClass('alert alert-error').html(data.error);
+					     //}
+					 }, 'json')									
+					 .fail(function(data) {
+						 $('#login-error').addClass('alert alert-error').html("Invalid username/password");
+					 });
+			     }
+			 });
+		});
+
+
+		</script>
+		<form id="login-form">
+			<div id="login-error"></div>
+			<div class="control-group">
+				<div class="controls"><input style="margin-bottom: 15px;" type="text" placeholder="Username" id="username" name="username"></div>
+			</div>
+			<div class="control-group">
+				<div class="controls"><input style="margin-bottom: 15px;" type="password" placeholder="Password" id="password" name="password"></div>
+			</div>
+			<input style="float: left; margin-right: 10px;" type="checkbox" name="remember-me" id="remember-me" value="true">
+			<label class="string optional" for="user_remember_me"> Remember me</label>
+			<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="Sign In">
+			
+		</form>
+	</div>
+</li>

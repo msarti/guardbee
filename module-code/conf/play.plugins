@@ -1,0 +1,9 @@
+1000:guardbee.services.providers.UsernamePasswordAuthenticationProvider
+1001:guardbee.services.providers.OAuth2AuthenticationProvider
+1002:guardbee.services.providers.BcryptPasswordProvider
+1003:guardbee.services.providers.CacheUserService
+1004:guardbee.services.providers.CacheAccessTokenService
+1005:guardbee.services.providers.CacheAuthStoreProvider
+1006:guardbee.services.providers.DefaultTemplateProvider
+
+

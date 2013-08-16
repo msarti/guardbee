@@ -1,0 +1,5 @@
+#Error messages
+guardbee.error.secured.forbiddenLong=Spiacente, non hai i permessi per visualizzare la pagina
+guardbee.error.secured.forbiddenShort=Accesso negato
+
+

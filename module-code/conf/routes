@@ -1,0 +1,18 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET     /                           controllers.MainController.index()
+GET     /authorized                     controllers.MainController.myAuth()
+GET     /testoauth                     controllers.MainController.oauth()
+GET     /message                    controllers.MessageController.getMessage()
+GET     /assets/javascripts/routes  controllers.MessageController.javascriptRoutes()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /webjars/*file              controllers.WebJarAssets.at(file)
+GET    /login						guardbee.controllers.LoginLogoutController.loginPage(destPage: String ?= "/")
+POST    /login						guardbee.controllers.LoginLogoutController.doLogin
+GET    /logout						guardbee.controllers.LoginLogoutController.doLogout
+GET	   /error/:status				guardbee.controllers.ErrorPagesController.errorPage(status: Int)
+

@@ -1,0 +1,4 @@
+#Error messages
+guardbee.error.secured.forbiddenLong=Sorry, you do not have permission to view the page
+guardbee.error.secured.forbiddenShort=Access denied
+
