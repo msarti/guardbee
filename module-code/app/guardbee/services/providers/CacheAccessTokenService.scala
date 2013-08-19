@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import guardbee.services.Error
 import guardbee.services.AuthCode
 import guardbee.services.Errors
+import guardbee.services.Scope
 
 case class SimpleAccessToken(
   access_token: String,
@@ -23,10 +24,13 @@ case class SimpleAccessToken(
 case class SimpleAuthCode(
   auth_code: String,
   user_id: String,
+  client_id: String,
   redirect_uri: String,
   scope: Seq[String],
   issued_on: DateTime,
-  expire_on: DateTime) extends AuthCode
+  expire_on: DateTime,
+  approval_prompt: Option[String],
+  state: Option[String]) extends AuthCode
 
 class CacheAccessTokenService(app: Application) extends AccessTokenService(app) with BaseCacheStore {
 
@@ -83,7 +87,7 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
     }
 
   }
-  
+
   def saveAuthCode(code: AuthCode): Either[Error, Unit] = {
     saveItem[AuthCode, String]("authCodes", code, code.auth_code)
     Right()
@@ -92,17 +96,23 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
   def newAuthCode(
     auth_code: String,
     user_id: String,
+    client_id: String,
     redirect_uri: String,
     scope: Seq[String],
     issued_on: DateTime,
-    expire_on: DateTime): AuthCode = {
+    expire_on: DateTime,
+    approval_prompt: Option[String],
+    state: Option[String]): AuthCode = {
     SimpleAuthCode(
       auth_code,
       user_id,
+      client_id,
       redirect_uri,
       scope,
       issued_on,
-      expire_on)
+      expire_on,
+      approval_prompt,
+      state)
   }
 
 }

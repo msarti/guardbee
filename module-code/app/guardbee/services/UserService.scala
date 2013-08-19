@@ -13,7 +13,7 @@ abstract class UserService(app: Application) extends BasePlugin with GuardbeeCon
   def getUserGrants(user: User): Seq[String]
   def saveUser(user: User): Either[Error, Unit]
   def disableUser(user_id: String): Either[Error, Unit]
-  def enableUser(user_id: String): Either[Error, Unit]
+  def enableUser(user_id: String, password: Option[Password] = None): Either[Error, User]
 
   def createDisabledUser(user_id: String, email: String): Either[Error, User] = {
     val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None)
@@ -74,8 +74,8 @@ object UserService extends ServiceCompanion[UserService] with GuardbeeConfigurat
       Left(Errors.InternalServerError)
     }
   }
-  def enableUser(user_id: String): Either[Error, Unit] = {
-    getDelegate.map(_.enableUser(user_id)) getOrElse {
+  def enableUser(user_id: String, password: Option[Password] = None): Either[Error, User] = {
+    getDelegate.map(_.enableUser(user_id, password)) getOrElse {
       notInitialized
       Left(Errors.InternalServerError)
     }
@@ -96,6 +96,15 @@ object UserService extends ServiceCompanion[UserService] with GuardbeeConfigurat
         notInitialized
         null
       }
+  }
+
+  
+  def createDisabledUser(user_id: String, email: String): Either[Error, User] = {
+    val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None)
+    saveUser(new_user) match {
+      case Left(error) => Left(error)
+      case Right(unit) => Right(new_user)
+    }
   }
 
 }

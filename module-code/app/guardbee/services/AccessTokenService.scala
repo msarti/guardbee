@@ -26,10 +26,13 @@ trait AccessToken {
 trait AuthCode {
   def auth_code: String
   def user_id: String
+  def client_id: String
   def redirect_uri: String
   def scope: Seq[String]
   def issued_on: DateTime
   def expire_on: DateTime
+  def approval_prompt: Option[String]
+  def state: Option[String]
 
   def isExpired = DateTime.now.isAfter(expire_on)
 }
@@ -95,10 +98,13 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
   def newAuthCode(
     auth_code: String,
     user_id: String,
+    client_id: String,
     redirect_uri: String,
     scope: Seq[String],
     issued_on: DateTime,
-    expire_on: DateTime): AuthCode
+    expire_on: DateTime,
+    approval_prompt: Option[String],
+    state: Option[String]): AuthCode
 
 }
 
@@ -176,11 +182,14 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
   def newAuthCode(
     auth_code: String,
     user_id: String,
+    client_id: String,
     redirect_uri: String,
     scope: Seq[String],
     issued_on: DateTime,
-    expire_on: DateTime): AuthCode = {
-    getDelegate.map(_.newAuthCode(auth_code, user_id, redirect_uri, scope, issued_on, expire_on))
+    expire_on: DateTime,
+    approval_prompt: Option[String],
+    state: Option[String]): AuthCode = {
+    getDelegate.map(_.newAuthCode(auth_code, user_id, client_id, redirect_uri, scope, issued_on, expire_on, approval_prompt, state))
       .getOrElse {
         notInitialized
         null

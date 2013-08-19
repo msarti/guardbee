@@ -52,10 +52,16 @@ class CacheUserService(app: Application) extends UserService(app)  with BaseCach
       
     }
   }
-  def enableUser(user_id: String): Either[Error, Unit] = {
+  def enableUser(user_id: String, password: Option[Password] = None): Either[Error, User] = {
     getItem[SimpleUser, String]("users", user_id) match {
       case Some(user) => {
-        saveUser(user.copy(enabled=true))
+        val new_user = user.copy(enabled=true, password = password)
+        saveUser(new_user) fold({
+          error => Left(error)
+        }, {
+          u =>
+          Right(new_user)
+        })
       }
       case _ => Left(Errors.UserNotFoundError)
     }

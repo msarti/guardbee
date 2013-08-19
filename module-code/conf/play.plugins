@@ -5,5 +5,6 @@
 1004:guardbee.services.providers.CacheAccessTokenService
 1005:guardbee.services.providers.CacheAuthStoreProvider
 1006:guardbee.services.providers.DefaultTemplateProvider
+1007:guardbee.services.providers.CacheClientIDService
 
 

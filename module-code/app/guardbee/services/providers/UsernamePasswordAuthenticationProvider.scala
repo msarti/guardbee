@@ -76,7 +76,7 @@ class UsernamePasswordAuthenticationProvider(application: Application)
   
   override def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
     val principal = for (
-      user <- UserService.getUserByID(authToken.name);
+      user <- UserService.getUserByID(authToken.name) if user.enabled;
       pwd <- UserService.getUserPassword(user);
       candidate <- authToken.credentials;
       hasher <- PasswordProvider.getDelegate(pwd.hasher) if hasher.matches(candidate.password, pwd)

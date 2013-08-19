@@ -28,7 +28,7 @@ class OAuth2AuthenticationProvider(application: Application)
     (for(
         credentials <- authToken.credentials if credentials.token_type == "Bearer";
         token <- AccessTokenService.getAccessToken(credentials.token) if token.isValid;
-        user <- UserService.getUserByID(token.user_id)) 
+        user <- UserService.getUserByID(token.user_id) if user.enabled) 
       yield (user, token)) match {
       case None => Left(InvalidCredentialsError)
       case Some((user, token)) => Right(Authentication(user.user_id, user, UserService.getUserGrants(user), id, Some(token.scope)))

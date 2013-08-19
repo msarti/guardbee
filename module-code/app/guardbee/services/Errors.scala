@@ -91,7 +91,7 @@ trait Errors {
     val status = UNAUTHORIZED
     val errorCode = "authentication_required_error"
 
-    override def htmlPageResult[A](implicit request: Request[A]): Result = Results.Redirect(RoutesHelper.loginPage(request.path))
+    override def htmlPageResult[A](implicit request: Request[A]): Result = Results.Redirect(RoutesHelper.loginPage(request.uri))
       
   }
 
