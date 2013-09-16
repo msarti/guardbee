@@ -28,9 +28,11 @@ abstract class TemplateProvider(app: Application) extends BasePlugin {
     TemplateProvider.setService(this)
   }
   
-  def loginPage(implicit flash: Flash): Html
+  def loginPage()(implicit flash: Flash,  token: play.filters.csrf.CSRF.Token): Html
   
-  def errorPage(title:String, message:String): Html
+  def errorPage(title:String, messages:Seq[String]): Html
+  
+  def appApprovalPage(title: String, client_id: Option[ClientID], scope: Seq[Option[Scope]], auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token): Html
 
 }
 
@@ -39,18 +41,26 @@ object TemplateProvider extends ServiceCompanion[TemplateProvider] {
   val default = "defaultTemplates"
   val Unique = true
 
-  def loginPage(implicit flash: Flash): Html = {
-    this.getDelegate.map(_.loginPage) getOrElse {
+  def loginPage()(implicit flash: Flash,  token: play.filters.csrf.CSRF.Token): Html = {
+    this.getDelegate.map(_.loginPage()(flash, token)) getOrElse {
       this.notInitialized
       null
     }
   }
     
-  def errorPage(title:String, message:String): Html = {
-    this.getDelegate.map(_.errorPage(title, message)) getOrElse {
+  def errorPage(title:String, messages:Seq[String]): Html = {
+    this.getDelegate.map(_.errorPage(title, messages)) getOrElse {
       this.notInitialized
       null
     }
   }
-    
+
+   def appApprovalPage(title: String, client_id: Option[ClientID], scope: Seq[Option[guardbee.services.Scope]], auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token): Html = {
+    this.getDelegate.map(_.appApprovalPage(title, client_id, scope, auth_code)) getOrElse {
+      this.notInitialized
+      null
+    }
+     
+   }
+
 }

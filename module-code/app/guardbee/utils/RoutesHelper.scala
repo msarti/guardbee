@@ -21,8 +21,14 @@ object RoutesHelper {
   lazy val errorPagesControllerMethods = errorPagesControllerClazz.newInstance().asInstanceOf[{
     def errorPage(status: Int): Call
   }]
-
   def errorPage(status: Int) = errorPagesControllerMethods.errorPage(status)
 
+    lazy val authorizationServerControllerClazz = Play.current.classloader.loadClass("guardbee.controllers.ReverseAuthorizationServerController")
+
+  
+  lazy val authorizationServerControllerMethods = authorizationServerControllerClazz.newInstance().asInstanceOf[{
+    def approve(approve: Boolean): Call
+  }]
+  def approve(approve: Boolean) = authorizationServerControllerMethods.approve(approve)
 
 }

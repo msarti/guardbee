@@ -96,7 +96,7 @@ class UsernamePasswordAuthenticationProvider(application: Application)
 
   def afterLoginUrl(implicit request: Request[AnyContent]) = {
     import Play.current
-    request.session.get("original-url").getOrElse(
+    request.cookies.get("original-url").map(_.value).getOrElse(
       Play.configuration.getString(Authentication.afterLoginUrlKey).getOrElse(
         Play.configuration.getString(Authentication.applicationContext).getOrElse("/")))
   }

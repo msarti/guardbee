@@ -15,13 +15,13 @@ object ApplicationBuild extends Build {
     //javaJdbc,  // Java database API
     //javaEbean, // Java Ebean plugin
     //javaJpa,   // Java JPA plugin
-    //filters,   // A set of built-in filters
+    filters,   // A set of built-in filters
     javaCore,  // The core Java API
   
     // WebJars pull in client-side web libraries
     "org.webjars" % "webjars-play" % "2.1.0",
-    "org.webjars" % "bootstrap" % "2.3.1",
-    "org.webjars" % "font-awesome" % "3.1.1-1",
+    "org.webjars" % "bootstrap" % "2.3.2",
+    "org.webjars" % "font-awesome" % "3.2.1",
     "org.mindrot" % "jbcrypt" % "0.3m"
   
     // Add your own project dependencies in the form:

@@ -10,6 +10,7 @@ trait ClientID {
   def userId: String
   def homePageUrl: Option[String]
   def redirectURIs: Seq[String]
+  def allowRedirectToLocalhost: Boolean
   def secret: String
   def issuedOn: DateTime
 }
@@ -36,6 +37,7 @@ abstract class ClientIDService(app: Application) extends BasePlugin with Errors 
     userId: String,
     homePageUrl: Option[String],
     redirectURIs: Seq[String],
+    allowRedirectToLocalhost: Boolean,
     secret: String,
     issuedOn: DateTime = DateTime.now): ClientID
 
@@ -54,6 +56,8 @@ abstract class ClientIDService(app: Application) extends BasePlugin with Errors 
     userId: String,
     scope: Seq[String],
     issuedOn: DateTime): ClientIDAuthorization
+    
+  def findAuthorization(clientId: String, userId: String): Option[ClientIDAuthorization]
 
   def saveAuthorization(clientId: ClientIDAuthorization): Either[Error, Unit]
 
@@ -82,9 +86,10 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
     userId: String,
     homePageUrl: Option[String],
     redirectURIs: Seq[String],
+    allowRedirectToLocalhost: Boolean,
     secret: String,
     issuedOn: DateTime = DateTime.now): ClientID = {
-    getDelegate map (_.newClientId(clientId, description, userId, homePageUrl, redirectURIs, secret, issuedOn)) getOrElse {
+    getDelegate map (_.newClientId(clientId, description, userId, homePageUrl, redirectURIs, allowRedirectToLocalhost, secret, issuedOn)) getOrElse {
       notInitialized
       null
     }
@@ -122,6 +127,14 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
     }
   }
 
+  def findAuthorization(clientId: String, userId: String): Option[ClientIDAuthorization] = {
+    getDelegate map (_.findAuthorization(clientId, userId)) getOrElse {
+      notInitialized
+      None
+    }
+  }
+  
+  
   def saveAuthorization(auth: ClientIDAuthorization): Either[Error, Unit] = {
     getDelegate map (_.saveAuthorization(auth)) getOrElse {
       notInitialized

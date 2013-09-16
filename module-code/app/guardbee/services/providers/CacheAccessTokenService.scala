@@ -8,6 +8,8 @@ import guardbee.services.Error
 import guardbee.services.AuthCode
 import guardbee.services.Errors
 import guardbee.services.Scope
+import guardbee.services.ClientIDService
+import guardbee.services.ClientID
 
 case class SimpleAccessToken(
   access_token: String,
@@ -30,7 +32,13 @@ case class SimpleAuthCode(
   issued_on: DateTime,
   expire_on: DateTime,
   approval_prompt: Option[String],
-  state: Option[String]) extends AuthCode
+  state: Option[String]) extends AuthCode {
+  
+  lazy val getClientID: Option[ClientID] = ClientIDService.findById(client_id)
+  lazy val getScopes: Seq[Option[Scope]] = scope.map(ClientIDService.findScope(_))
+  
+  
+}
 
 class CacheAccessTokenService(app: Application) extends AccessTokenService(app) with BaseCacheStore {
 

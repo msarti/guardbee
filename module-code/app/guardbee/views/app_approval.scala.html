@@ -1,0 +1,43 @@
+@(title: String, client_id: Option[guardbee.services.ClientID], scope: Seq[Option[guardbee.services.Scope]], auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token) 
+@import helper._
+@import play.filters._
+@import guardbee.utils._
+@guardbee.views.html.simplebase(title) {
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#approve-button").click( function() {
+	    $("#approval-form").attr('action', '@Html(CSRF(RoutesHelper.approve(true)).toString)');
+	    $("#approval-form").submit();
+	});
+	
+	$("#reject-button").click( function() {
+	    $("#approval-form").attr('action', '@Html(CSRF(RoutesHelper.approve(false)).toString)');
+	    $("#approval-form").submit();
+	});
+});
+</script>
+<div class="container">
+	<table class="table table-hover">
+	@scope.map { s => 
+		@s.map { d =>
+		<tr>
+		<td>@d.description</td>
+		</tr>
+		}
+	}
+	</table>
+	<form id="approval-form" method="post">
+	@client_id.map { i =>
+		<input type="hidden" name="client_id" value="@i.clientId">
+	}
+	@auth_code.map { a =>
+		<input type="hidden" name="redirect_uri" value="@a.redirect_uri">
+		<input type="hidden" name="code" value="@a.auth_code">
+	}
+		<button id="approve-button" name="submit" class="btn btn-info btn-block">Approve</button>
+		<button id="reject-button" name="submit" class="btn btn-info btn-block">Reject</button>
+	</form>
+	
+	
+</div>
+}

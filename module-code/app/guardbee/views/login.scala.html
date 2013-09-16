@@ -1,6 +1,7 @@
-@()(implicit flash: play.api.mvc.Flash)
+@()(implicit flash: play.api.mvc.Flash, token: play.filters.csrf.CSRF.Token)
 @import play.api.mvc._
-@simplebase("Login") {
+@import helper._
+@guardbee.views.html.simplebase("Login") {
 <div class="container">
 	<div class="row">
 		<div class="span4 offset4 well">
@@ -10,14 +11,14 @@
                 <a class="close" data-dismiss="alert" href="#">×</a>@message
             </div>
             }
-			<form method="POST" action="" accept-charset="UTF-8">
+            @form(CSRF(guardbee.controllers.routes.LoginLogoutController.doLogin())) {
 			<input type="text" id="username" class="span4" name="username" placeholder="Username">
 			<input type="password" id="password" class="span4" name="password" placeholder="Password">
             <label class="checkbox">
             	<input type="checkbox" name="remember-me" value="1"> Remember Me
             </label>
 			<button type="submit" name="submit" class="btn btn-info btn-block">Sign in</button>
-			</form>    
+			}   
 		</div>
 	</div>
 </div>

@@ -26,11 +26,14 @@ import guardbee.services.TemplateProvider
  *
  */
 object ErrorPagesController extends Controller {
-  
+
   def errorPage(status: Int) = Action {
     implicit request =>
-    
-    Status(status)(TemplateProvider.errorPage("Error "+status,flash.get("message").getOrElse("generic_error")))
+      val s = (0 to 20).toSeq.map(s => flash.get("message" + s)).collect {
+        case Some(p) => p
+      }
+
+      Status(status)(TemplateProvider.errorPage("Error " + status, s))
   }
 
 }

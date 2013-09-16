@@ -20,6 +20,7 @@ package controllers
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json.Json
 import play.api.Routes
+import play.api.Logger
 
 case class Message(value: String)
 
@@ -27,8 +28,13 @@ object MessageController extends Controller {
 
   implicit val fooWrites = Json.writes[Message]
 
-  def getMessage = Action {
-    Ok(Json.toJson(Message("Hello from Scala")))
+  def getMessage = Action { implicit request =>
+    Logger.info("getMessage")
+    render {
+      case Accepts.Html => Ok(Json.toJson(Message("Html")))
+      case Accepts.Json => Ok(Json.toJson(Message("Json")))
+      case _ => Ok(Json.toJson(Message("Other")))
+    }
   }
 
   def javascriptRoutes = Action { implicit request =>

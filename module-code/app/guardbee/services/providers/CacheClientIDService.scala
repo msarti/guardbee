@@ -17,6 +17,7 @@ case class SimpleCliendID(
   userId: String,
   homePageUrl: Option[String],
   redirectURIs: Seq[String],
+  allowRedirectToLocalhost: Boolean,
   secret: String,
   issuedOn: DateTime = DateTime.now) extends ClientID
 
@@ -43,6 +44,7 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
     userId: String,
     homePageUrl: Option[String],
     redirectURIs: Seq[String],
+    allowRedirectToLocalhost: Boolean,
     secret: String,
     issuedOn: DateTime = DateTime.now) = {
     SimpleCliendID(
@@ -51,6 +53,7 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
       userId,
       homePageUrl,
       redirectURIs,
+      allowRedirectToLocalhost,
       secret,
       issuedOn)
   }
@@ -81,6 +84,11 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
       issuedOn)
   }
 
+  def findAuthorization(clientId: String, userId: String): Option[ClientIDAuthorization] = {
+    getItem[ClientIDAuthorization, (String, String)]("clientIdAuthorizations", (clientId, userId))
+  }
+  
+  
   def saveAuthorization(clientId: ClientIDAuthorization): Either[Error, Unit] = {
     saveItem[ClientIDAuthorization, (String, String)]("clientIdAuthorizations", clientId, (clientId.clientId, clientId.userId))
     Right()

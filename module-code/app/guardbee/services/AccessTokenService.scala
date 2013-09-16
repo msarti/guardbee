@@ -35,6 +35,10 @@ trait AuthCode {
   def state: Option[String]
 
   def isExpired = DateTime.now.isAfter(expire_on)
+  
+  def getScopes: Seq[Option[Scope]]
+  def getClientID: Option[ClientID]
+  
 }
 
 abstract class AccessTokenService(app: Application) extends BasePlugin with GuardbeeConfiguration {

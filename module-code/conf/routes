@@ -17,5 +17,6 @@ GET    /logout						guardbee.controllers.LoginLogoutController.doLogout
 GET	   /error/:status				guardbee.controllers.ErrorPagesController.errorPage(status: Int)
 
 GET	   /oauth2/auth				guardbee.controllers.AuthorizationServerController.code
+POST	   /oauth2/approve			guardbee.controllers.AuthorizationServerController.approve(approve: Boolean ?= true)
 
 

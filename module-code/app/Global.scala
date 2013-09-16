@@ -5,8 +5,10 @@ import guardbee.services.UserService
 import guardbee.services.PasswordProvider
 import guardbee.services.ClientIDService
 import org.joda.time.DateTime
+import play.api.mvc.WithFilters
+import play.filters.csrf._
 
-object Global extends GlobalSettings {
+object Global extends WithFilters(new CSRFFilter()) with GlobalSettings {
 
   override def onStart(app: Application): Unit = {
     Logger.info("Starting application")
@@ -21,7 +23,7 @@ object Global extends GlobalSettings {
     Logger.info("Created user " + user)
 
     ClientIDService.saveScope(ClientIDService.newScope("getProfile", "guardbee.scope.getProfile"))
-    ClientIDService.save(ClientIDService.newClientId("clientId", "Test application", "admin@example.org", None, Seq("http://localhost:9000/code"), "secret", DateTime.now))
+    ClientIDService.save(ClientIDService.newClientId("clientId", "Test application", "admin@example.org", None, Seq("urn:ietf:wg:oauth:2.0:oob"), true, "secret", DateTime.now))
     
     
   }

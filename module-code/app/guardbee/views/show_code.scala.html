@@ -1,0 +1,15 @@
+@* show_code Template File *@
+@(auth_code: guardbee.services.AuthCode)
+<html>
+	<head>
+		<title>@auth_code.auth_code</title>
+	</head>
+	<body>
+		<p>Auth code: @auth_code.auth_code</p>
+		@auth_code.state.map { c =>
+		<p>State: @c</p>
+		}
+	
+	</body>
+
+</html>

@@ -1,4 +1,5 @@
-@()
+@()(implicit token: play.filters.csrf.CSRF.Token)
+@import helper._
 <li class="dropdown">
 	<a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
 	<div class="dropdown-menu" style="padding: 15px; padding-bottom: 0px;">
@@ -21,7 +22,7 @@
 					 element.addClass('valid').closest('.control-group').removeClass('error').addClass('success');
 				 },
 				 submitHandler: function(form) {
-					 $.post('/login', $('#login-form').serialize(), function(data) {
+					 $.post($('#login-form').attr('action'), $('#login-form').serialize(), function(data) {
 						// if(data.status == "OK") {
 						 	window.location.replace(data.toUrl);
 						 //} else {
@@ -37,7 +38,7 @@
 
 
 		</script>
-		<form id="login-form">
+		@form(CSRF(guardbee.controllers.routes.LoginLogoutController.doLogin()), 'id -> "login-form") {
 			<div id="login-error"></div>
 			<div class="control-group">
 				<div class="controls"><input style="margin-bottom: 15px;" type="text" placeholder="Username" id="username" name="username"></div>
@@ -49,6 +50,6 @@
 			<label class="string optional" for="user_remember_me"> Remember me</label>
 			<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="Sign In">
 			
-		</form>
+		}
 	</div>
 </li>

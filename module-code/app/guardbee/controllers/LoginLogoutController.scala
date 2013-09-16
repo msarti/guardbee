@@ -25,17 +25,12 @@ import play.api.Logger
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import guardbee.services.TemplateProvider
+import play.api.mvc.Cookie
 
 
-case class Login(username: String, password: String, remember_me: Boolean)
 
 object LoginLogoutController extends Controller {
 
-  val form = Form(
-    mapping(
-      "username" -> text,
-      "password" -> text,
-      "remember-me" -> checked("Remember me"))(Login.apply)(Login.unapply))
 
   def doLogin = Action { implicit request =>
     AuthenticationProvider.handleLogin("usernamepassword")
@@ -47,8 +42,8 @@ object LoginLogoutController extends Controller {
   }
   
   def loginPage(destPage: String) = Action { implicit request =>
-    
-    Ok(TemplateProvider.loginPage).withSession("original-url" -> destPage)
+    import play.filters.csrf._
+    Ok(TemplateProvider.loginPage()).withCookies(Cookie("original-url",destPage))
     
   }
 
