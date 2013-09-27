@@ -6,6 +6,8 @@ GET     /                           controllers.MainController.index()
 GET     /authorized                     controllers.MainController.myAuth()
 GET     /testoauth                     controllers.MainController.oauth()
 GET     /message                    controllers.MessageController.getMessage()
+GET		/code						controllers.MainController.code(code: Option[String], error: Option[String])
+
 GET     /assets/javascripts/routes  controllers.MessageController.javascriptRoutes()
 
 # Map static resources from the /public folder to the /assets URL path
@@ -18,5 +20,6 @@ GET	   /error/:status				guardbee.controllers.ErrorPagesController.errorPage(sta
 
 GET	   /oauth2/auth				guardbee.controllers.AuthorizationServerController.code
 POST	   /oauth2/approve			guardbee.controllers.AuthorizationServerController.approve(approve: Boolean ?= true)
+GET	   /oauth2/token				guardbee.controllers.AuthorizationServerController.token
 
 

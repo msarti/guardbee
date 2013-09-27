@@ -18,34 +18,33 @@
 package guardbee
 
 import guardbee.services.Authentication
-import guardbee.services.Error
-import guardbee.services.Errors._
+import guardbee.utils.GuardbeeError
 package object authorization {
   
-  def isAuthenticated(auth: Option[Authentication]): Either[Error, Unit] = {
+  def isAuthenticated(auth: Option[Authentication]): Either[GuardbeeError, Unit] = {
     auth.map {
       a => Right()
-    } getOrElse Left(AccessDeniedError)
+    } getOrElse Left(GuardbeeError.AccessDeniedError)
   }
   
-  def hasRole(role: String)(auth: Option[Authentication]): Either[Error, Unit] = {
+  def hasRole(role: String)(auth: Option[Authentication]): Either[GuardbeeError, Unit] = {
     auth map {
-      a => if(a.grants.contains(role)) Right() else Left(AccessDeniedError)
-    } getOrElse Left(AccessDeniedError)
+      a => if(a.grants.contains(role)) Right() else Left(GuardbeeError.AccessDeniedError)
+    } getOrElse Left(GuardbeeError.AccessDeniedError)
   }
   
-  def hasScope(scope: String)(auth: Option[Authentication]): Either[Error, Unit] = {
+  def hasScope(scope: String)(auth: Option[Authentication]): Either[GuardbeeError, Unit] = {
     auth.map {
-      a => if(a.scope.map(_.contains(scope)).getOrElse(false)) Right() else Left(AccessDeniedError)
-      } getOrElse Left(AccessDeniedError)
+      a => if(a.scope.map(_.contains(scope)).getOrElse(false)) Right() else Left(GuardbeeError.AccessDeniedError)
+      } getOrElse Left(GuardbeeError.AccessDeniedError)
   }
 
-  def hasScope(scope: String, role: String)(auth: Option[Authentication]): Either[Error, Unit] = {
+  def hasScope(scope: String, role: String)(auth: Option[Authentication]): Either[GuardbeeError, Unit] = {
     auth.map {
       a => if(
         a.scope.map(_.contains(scope)).getOrElse(false) &&
         a.grants.contains(role)
-        ) Right() else Left(AccessDeniedError)
-      } getOrElse Left(AccessDeniedError)
+        ) Right() else Left(GuardbeeError.AccessDeniedError)
+      } getOrElse Left(GuardbeeError.AccessDeniedError)
   }
 }

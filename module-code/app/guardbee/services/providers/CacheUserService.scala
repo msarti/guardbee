@@ -4,9 +4,8 @@ import play.api.Application
 import guardbee.services.UserService
 import guardbee.services.User
 import guardbee.services.Password
-import guardbee.services.Error
 import org.joda.time.DateTime
-import guardbee.services.Errors
+import guardbee.utils.GuardbeeError
 
 case class SimpleUser(
   user_id: String,
@@ -39,20 +38,20 @@ class CacheUserService(app: Application) extends UserService(app)  with BaseCach
       Nil
     }
   }
-  def saveUser(user: User): Either[Error, Unit] = {
+  def saveUser(user: User): Either[GuardbeeError, Unit] = {
     saveItem("users", user, user.user_id)
     Right()
   }
-  def disableUser(user_id: String): Either[Error, Unit] = {
+  def disableUser(user_id: String): Either[GuardbeeError, Unit] = {
     getItem[SimpleUser, String]("users", user_id) match {
       case Some(user) => {
         saveUser(user.copy(enabled=false))
       }
-      case _ => Left(Errors.UserNotFoundError)
+      case _ => Left(GuardbeeError.UserNotFoundError)
       
     }
   }
-  def enableUser(user_id: String, password: Option[Password] = None): Either[Error, User] = {
+  def enableUser(user_id: String, password: Option[Password] = None): Either[GuardbeeError, User] = {
     getItem[SimpleUser, String]("users", user_id) match {
       case Some(user) => {
         val new_user = user.copy(enabled=true, password = password)
@@ -63,7 +62,7 @@ class CacheUserService(app: Application) extends UserService(app)  with BaseCach
           Right(new_user)
         })
       }
-      case _ => Left(Errors.UserNotFoundError)
+      case _ => Left(GuardbeeError.UserNotFoundError)
     }
   }
   

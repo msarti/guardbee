@@ -5,4 +5,4 @@ guardbee.error.redirectUriInvalid=The specified redirect_uri is not valid
 
 error.required={0} this field is required
 
-
+guardbee.message.appApproval=The application <strong>{0}</strong> requires the following authorization(s): 

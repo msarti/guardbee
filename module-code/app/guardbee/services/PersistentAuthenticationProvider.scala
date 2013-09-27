@@ -4,6 +4,7 @@ import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import play.api.mvc.Result
 import play.api.mvc.Results
+import guardbee.utils.GuardbeeError
 
 abstract class PersistentAuthenticationProvider extends BasePlugin {
   type CredentialsType <: Credentials
@@ -12,23 +13,23 @@ abstract class PersistentAuthenticationProvider extends BasePlugin {
     name: String,
     credentials: Option[CredentialsType])
 
-  def extractAuthToken(implicit request: Request[AnyContent]): Either[Error, AuthenticationToken]
-  def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[Error, Authentication]
+  def extractAuthToken(implicit request: Request[AnyContent]): Either[GuardbeeError, AuthenticationToken]
+  def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication]
 
   def onLoginSuccess(authentication: Authentication)(implicit request: Request[AnyContent]): Result
   def onLoginFailure(implicit request: Request[AnyContent]): Result
 
-  def getAuthentication(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
+  def getAuthentication(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
 
     Authentication.getCookie flatMap {
       cookie =>
         AuthStoreProvider.get(cookie).filter(a => a.isExpired == false)
-    } toRight (Errors.AuthenticationRequiredError)
+    } toRight (GuardbeeError.AuthenticationRequiredError)
   }
 
   def isAuthenticated(implicit request: Request[AnyContent]): Boolean = getAuthentication.isRight
 
-  def handleAuthentication(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
+  def handleAuthentication(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
     for (
       token <- extractAuthToken.right;
       auth <- authenticate(token).right

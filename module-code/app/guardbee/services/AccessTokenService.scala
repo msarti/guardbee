@@ -4,6 +4,8 @@ import play.api.Application
 import org.joda.time.DateTime
 import java.util.UUID
 import guardbee.utils.GuardbeeConfiguration
+import org.joda.time.Minutes
+import guardbee.utils.GuardbeeError
 
 trait AccessToken {
   def access_token: String
@@ -21,6 +23,8 @@ trait AccessToken {
   def isRefreshTokenExpired = refresh_token_expiration.isBefore(DateTime.now)
 
   def isValid = !isAccessTokenExpired && !revoked
+  
+  lazy val expires_in = Minutes.minutesBetween(issued_on, access_token_expiration).getMinutes
 }
 
 trait AuthCode {
@@ -48,8 +52,8 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
   }
 
   def getAccessToken(token: String): Option[AccessToken]
-  def saveAccessToken(access_token: AccessToken): Either[Error, Unit]
-  def deleteAccessToken(token: String): Either[Error, Unit]
+  def saveAccessToken(access_token: AccessToken): Either[GuardbeeError, Unit]
+  def deleteAccessToken(token: String): Either[GuardbeeError, Unit]
   def newAccessToken(
     access_token: String,
     token_type: String,
@@ -61,7 +65,7 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
     revoked: Boolean = false,
     issued_on: DateTime = DateTime.now,
     revoked_on: Option[DateTime] = None): AccessToken
-  def revokeAccessToken(token: String): Either[Error, Unit] = {
+  def revokeAccessToken(token: String): Either[GuardbeeError, Unit] = {
     getAccessToken(token).map {
       t =>
         saveAccessToken(newAccessToken(t.access_token,
@@ -74,10 +78,10 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
           true,
           t.issued_on,
           Some(DateTime.now)))
-    }.getOrElse(Left(Errors.RevokeAccessTokenError))
+    }.getOrElse(Left(GuardbeeError.RevokeAccessTokenError))
   }
 
-  def issueAccessToken(user_id: String, scope: Seq[String]): Either[Error, AccessToken] = {
+  def issueAccessToken(user_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
     val new_token = newAccessToken(UUID.randomUUID.toString,
       "Bearer",
       scope,
@@ -96,8 +100,8 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
 
   //AuthCode
   def getAuthCode(code: String): Option[AuthCode]
-  def consumeAuthCode(code: String): Either[Error, AuthCode]
-  def saveAuthCode(code: AuthCode): Either[Error, Unit]
+  def consumeAuthCode(code: String): Either[GuardbeeError, AuthCode]
+  def saveAuthCode(code: AuthCode): Either[GuardbeeError, Unit]
 
   def newAuthCode(
     auth_code: String,
@@ -123,16 +127,22 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
       None
     }
   }
-  def saveAccessToken(access_token: AccessToken): Either[Error, Unit] = {
+  def saveAccessToken(access_token: AccessToken): Either[GuardbeeError, Unit] = {
     getDelegate map (_.saveAccessToken(access_token)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
-  def deleteAccessToken(token: String): Either[Error, Unit] = {
+  def deleteAccessToken(token: String): Either[GuardbeeError, Unit] = {
     getDelegate map (_.deleteAccessToken(token)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
+    }
+  }
+  def issueAccessToken(user_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
+    getDelegate map (_.issueAccessToken(user_id, scope)) getOrElse {
+      notInitialized
+      Left(GuardbeeError.InternalServerError)
     }
   }
 
@@ -171,16 +181,16 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
       None
     }
   }
-  def consumeAuthCode(code: String): Either[Error, AuthCode] = {
+  def consumeAuthCode(code: String): Either[GuardbeeError, AuthCode] = {
     getDelegate.map(_.consumeAuthCode(code)).getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
-  def saveAuthCode(code: AuthCode): Either[Error, Unit] = {
+  def saveAuthCode(code: AuthCode): Either[GuardbeeError, Unit] = {
     getDelegate.map(_.saveAuthCode(code)).getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
   def newAuthCode(

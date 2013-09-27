@@ -18,6 +18,11 @@ import guardbee.utils.GuardbeeConfiguration
 import guardbee.views.html.show_code
 import java.net.URI
 import java.net.URL
+import play.api.mvc.Action
+import play.api.libs.json.Json
+import guardbee.utils.GuardbeeErrorMessages
+import play.api.mvc.Request
+import guardbee.utils.GuardbeeError
 
 object AuthorizationServerController extends Controller with Secured {
 
@@ -92,7 +97,7 @@ object AuthorizationServerController extends Controller with Secured {
         errors =>
           val e = errors.errors
           Logger.info(e.mkString("-"))
-          Errors.GenericError(e, BAD_REQUEST, "").htmlPageResult
+          GuardbeeError(BAD_REQUEST, "", e)(MimeTypes.HTML)
       }, {
         success =>
           AccessTokenService.saveAuthCode(success)
@@ -157,7 +162,7 @@ object AuthorizationServerController extends Controller with Secured {
         errors =>
           val e = errors.errors
           logger.info(e.mkString("-"))
-          Errors.GenericError(e, BAD_REQUEST, "").htmlPageResult
+          GuardbeeError(BAD_REQUEST, "", e)(MimeTypes.HTML)
       }, {
         success =>
           //If client_id and redirect_uri are valid I continue with approval flow
@@ -167,5 +172,67 @@ object AuthorizationServerController extends Controller with Secured {
       })
 
   }
+  
+  case class TokenForm(code: String, client_id:String, client_secret:String, redirect_uri:String, grant_type:String) {
+    lazy val getClientID = ClientIDService.findById(client_id)
+    lazy val getCode = AccessTokenService.getAuthCode(code)
+    
+  }
+  
+  def token = Action { implicit request =>
+      val form = Form(
+        mapping(
+          "code" -> text,
+          "client_id" -> text,
+          "client_secret" -> text,
+          "redirect_uri" -> text,
+          "grant_type" -> text.verifying(GuardbeeErrorMessages.InvalidGrantType(), {g => g == "authorization_code"})
+          )(TokenForm.apply)(TokenForm.unapply)
+          .verifying(GuardbeeErrorMessages.InvalidAuthCode(), {f => f.getCode.isDefined})
+          .verifying(GuardbeeErrorMessages.InvalidClientID(), {f => f.getClientID.isDefined})
+          .verifying(GuardbeeErrorMessages.InvalidClientID(), {f => 
+            f.getCode.map { c =>
+              c.client_id == f.client_id
+            }.getOrElse(false)
+          })
+          .verifying(GuardbeeErrorMessages.InvalidSecret(), {f => 
+            f.getClientID.map { c =>
+              c.secret == f.client_secret
+            }.getOrElse(false)
+          })
+          .verifying(GuardbeeErrorMessages.InvalidRedirectUri(""), {f => 
+            f.getCode.map { c =>
+              c.redirect_uri == f.redirect_uri
+            }.getOrElse(false)
+          })
+      )
+      form.bindFromRequest()(request).fold({
+        errors =>
+          val e = errors.errors
+          logger.info(e.map(f => f.message).mkString("-"))
+          GuardbeeError(BAD_REQUEST, "", errors.errors) (MimeTypes.JSON)
+      }, {
+        success =>
+          tokenByAuthCode(success.code)
+      })
+  }
+  
+  
+  
+  def tokenByAuthCode[A](code: String)(implicit request:Request[A]) = {
+	AccessTokenService.consumeAuthCode(code).fold({ error =>
+	  error(MimeTypes.JSON)
+	}, { authCode =>
+	  AccessTokenService.issueAccessToken(authCode.user_id, authCode.scope).fold({ error =>
+	    error(MimeTypes.JSON)
+	  }, { token =>
+	    Ok(Json.obj("access_token" -> token.access_token, 
+	        "expires_in" -> token.expires_in, 
+	        "token_type" -> token.token_type,
+	        "refresh_token" -> token.refresh_token))
+	  })
+	})
+  }
+  
 
 }

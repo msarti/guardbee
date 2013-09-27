@@ -41,8 +41,8 @@ import play.api.mvc.RequestHeader
 import play.api.Play
 import play.api.libs.json.Json
 import guardbee.utils.RoutesHelper
-import guardbee.services.Error
 import guardbee.services.UserService
+import guardbee.utils.GuardbeeError
 case class PlainPassword(password: String, rememberMe: Boolean) extends Credentials
 
 class UsernamePasswordAuthenticationProvider(application: Application)
@@ -58,11 +58,11 @@ class UsernamePasswordAuthenticationProvider(application: Application)
       "password" -> nonEmptyText,
       "remember-me" -> optional(boolean))((username, password, rememberMe) => AuthenticationToken(name = username, credentials = Some(PlainPassword(password, rememberMe.getOrElse(false)))))((auth: AuthenticationToken) => Some((auth.name, auth.credentials.map(_.password).getOrElse(""), Some(false)))))
 
-  def extractAuthToken(implicit request: Request[AnyContent]): Either[Error, AuthenticationToken] = {
+  def extractAuthToken(implicit request: Request[AnyContent]): Either[GuardbeeError, AuthenticationToken] = {
     form.bindFromRequest.fold(
       formWithErrors => {
         Logger.warn(formWithErrors.errors.map(f => f.key + "->" + f.message).mkString)
-        Left(AuthenticationError)
+        Left(GuardbeeError.AuthenticationError)
       },
       success => {
         Logger.debug("Authentication attempted: username = " + success.name + ", credentials = <hidden>, remember-me = " + success.credentials.map(_.rememberMe).getOrElse(false))
@@ -74,7 +74,7 @@ class UsernamePasswordAuthenticationProvider(application: Application)
 
   
   
-  override def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
+  override def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
     val principal = for (
       user <- UserService.getUserByID(authToken.name) if user.enabled;
       pwd <- UserService.getUserPassword(user);
@@ -83,8 +83,9 @@ class UsernamePasswordAuthenticationProvider(application: Application)
     ) yield user
     principal match {
       case None => {
+        
         Logger.warn("User "+authToken.name+": invalid credentials")
-        Left(AuthenticationError)
+        Left(GuardbeeError.AuthenticationError)
       }
       case Some(value) => {
         Logger.info("User "+value.user_id+" succesfully authenticated")

@@ -4,12 +4,12 @@ import guardbee.services.AccessTokenService
 import play.api.Application
 import guardbee.services.AccessToken
 import org.joda.time.DateTime
-import guardbee.services.Error
+import guardbee.utils.GuardbeeError
 import guardbee.services.AuthCode
-import guardbee.services.Errors
 import guardbee.services.Scope
 import guardbee.services.ClientIDService
 import guardbee.services.ClientID
+
 
 case class SimpleAccessToken(
   access_token: String,
@@ -71,12 +71,12 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
   def getAccessToken(token: String): Option[AccessToken] = {
     getItem[AccessToken, String]("accessTokens", token)
   }
-  def saveAccessToken(access_token: AccessToken): Either[Error, Unit] = {
+  def saveAccessToken(access_token: AccessToken): Either[GuardbeeError, Unit] = {
     saveItem[AccessToken, String]("accessTokens", access_token, access_token.access_token)
     Right()
 
   }
-  def deleteAccessToken(token: String): Either[Error, Unit] = {
+  def deleteAccessToken(token: String): Either[GuardbeeError, Unit] = {
     deleteItem[AccessToken, String]("accessTokens", token)
     Right()
   }
@@ -85,18 +85,18 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
   def getAuthCode(code: String): Option[AuthCode] = {
     getItem[AuthCode, String]("authCodes", code)
   }
-  def consumeAuthCode(code: String): Either[Error, AuthCode] = {
+  def consumeAuthCode(code: String): Either[GuardbeeError, AuthCode] = {
     getAuthCode(code) match {
       case Some(value) => {
         deleteItem[AuthCode, String]("authCodes", code)
         Right(value)
       }
-      case _ => Left(Errors.InvalidAuthCodeError)
+      case _ => Left(GuardbeeError.InvalidAuthCodeError)
     }
 
   }
 
-  def saveAuthCode(code: AuthCode): Either[Error, Unit] = {
+  def saveAuthCode(code: AuthCode): Either[GuardbeeError, Unit] = {
     saveItem[AuthCode, String]("authCodes", code, code.auth_code)
     Right()
   }

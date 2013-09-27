@@ -23,7 +23,7 @@ object Global extends WithFilters(new CSRFFilter()) with GlobalSettings {
     Logger.info("Created user " + user)
 
     ClientIDService.saveScope(ClientIDService.newScope("getProfile", "guardbee.scope.getProfile"))
-    ClientIDService.save(ClientIDService.newClientId("clientId", "Test application", "admin@example.org", None, Seq("urn:ietf:wg:oauth:2.0:oob"), true, "secret", DateTime.now))
+    ClientIDService.save(ClientIDService.newClientId("clientId", "TestApp", "Test application", "admin@example.org", None, Seq("urn:ietf:wg:oauth:2.0:oob"), true, "secret", DateTime.now))
     
     
   }

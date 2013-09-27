@@ -1,6 +1,7 @@
 package guardbee.services
 
 import play.api.mvc._
+import guardbee.utils.GuardbeeError
 
 trait OAuth2Token {
   def tokenType: String
@@ -15,8 +16,8 @@ abstract class OAuth2AuthenticationProvider extends BasePlugin {
     name: String,
     credentials: Option[CredentialsType])
 
-  def extractAuthToken(implicit request: Request[AnyContent]): Either[Error, AuthenticationToken]
-  def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[Error, Authentication]
+  def extractAuthToken(implicit request: Request[AnyContent]): Either[GuardbeeError, AuthenticationToken]
+  def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication]
 
   override def onStart() = {
     OAuth2AuthenticationProvider.setService(this)

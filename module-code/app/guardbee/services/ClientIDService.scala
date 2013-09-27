@@ -3,9 +3,11 @@ package guardbee.services
 import org.joda.time.DateTime
 import guardbee.utils.GuardbeeConfiguration
 import play.api.Application
+import guardbee.utils.GuardbeeError
 
 trait ClientID {
   def clientId: String
+  def title: String
   def description: String
   def userId: String
   def homePageUrl: Option[String]
@@ -27,12 +29,13 @@ trait Scope {
   def description: String
 }
 
-abstract class ClientIDService(app: Application) extends BasePlugin with Errors with GuardbeeConfiguration {
+abstract class ClientIDService(app: Application) extends BasePlugin with GuardbeeConfiguration {
 
   final val unique = true
 
   def newClientId(
     clientId: String,
+    title: String,
     description: String,
     userId: String,
     homePageUrl: Option[String],
@@ -47,9 +50,9 @@ abstract class ClientIDService(app: Application) extends BasePlugin with Errors 
 
   def findById(clientId: String): Option[ClientID]
 
-  def save(clientId: ClientID): Either[Error, Unit]
+  def save(clientId: ClientID): Either[GuardbeeError, Unit]
 
-  def delete(clientId: String): Either[Error, Unit]
+  def delete(clientId: String): Either[GuardbeeError, Unit]
 
   def newClientIdAuthorization(
     clientId: String,
@@ -59,19 +62,19 @@ abstract class ClientIDService(app: Application) extends BasePlugin with Errors 
     
   def findAuthorization(clientId: String, userId: String): Option[ClientIDAuthorization]
 
-  def saveAuthorization(clientId: ClientIDAuthorization): Either[Error, Unit]
+  def saveAuthorization(clientId: ClientIDAuthorization): Either[GuardbeeError, Unit]
 
-  def deleteAuthorization(clientId: String, userId: String): Either[Error, Unit]
+  def deleteAuthorization(clientId: String, userId: String): Either[GuardbeeError, Unit]
 
   def newScope(
     scope: String,
     description: String): Scope
 
-  def saveScope(scope: Scope): Either[Error, Unit]
+  def saveScope(scope: Scope): Either[GuardbeeError, Unit]
 
   def findScope(scope: String): Option[Scope]
 
-  def deleteScope(scope: String): Either[Error, Unit]
+  def deleteScope(scope: String): Either[GuardbeeError, Unit]
 
 }
 
@@ -82,6 +85,7 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
 
   def newClientId(
     clientId: String,
+    title: String,
     description: String,
     userId: String,
     homePageUrl: Option[String],
@@ -89,7 +93,7 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
     allowRedirectToLocalhost: Boolean,
     secret: String,
     issuedOn: DateTime = DateTime.now): ClientID = {
-    getDelegate map (_.newClientId(clientId, description, userId, homePageUrl, redirectURIs, allowRedirectToLocalhost, secret, issuedOn)) getOrElse {
+    getDelegate map (_.newClientId(clientId, title, description, userId, homePageUrl, redirectURIs, allowRedirectToLocalhost, secret, issuedOn)) getOrElse {
       notInitialized
       null
     }
@@ -102,17 +106,17 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
     }
   }
 
-  def save(clientId: ClientID): Either[Error, Unit] = {
+  def save(clientId: ClientID): Either[GuardbeeError, Unit] = {
     getDelegate map (_.save(clientId)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
 
-  def delete(clientId: String): Either[Error, Unit] = {
+  def delete(clientId: String): Either[GuardbeeError, Unit] = {
     getDelegate map (_.delete(clientId)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
 
@@ -135,17 +139,17 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
   }
   
   
-  def saveAuthorization(auth: ClientIDAuthorization): Either[Error, Unit] = {
+  def saveAuthorization(auth: ClientIDAuthorization): Either[GuardbeeError, Unit] = {
     getDelegate map (_.saveAuthorization(auth)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
 
-  def deleteAuthorization(clientId: String, userId: String): Either[Error, Unit] = {
+  def deleteAuthorization(clientId: String, userId: String): Either[GuardbeeError, Unit] = {
     getDelegate map (_.deleteAuthorization(clientId, userId)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
 
@@ -158,10 +162,10 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
     }
   }
 
-  def saveScope(scope: Scope): Either[Error, Unit] = {
+  def saveScope(scope: Scope): Either[GuardbeeError, Unit] = {
     getDelegate map (_.saveScope(scope)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
 
   }
@@ -173,10 +177,10 @@ object ClientIDService extends ServiceCompanion[ClientIDService] with GuardbeeCo
     }
   }
 
-  def deleteScope(scope: String): Either[Error, Unit] = {
+  def deleteScope(scope: String): Either[GuardbeeError, Unit] = {
     getDelegate map (_.deleteScope(scope)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
 
   }

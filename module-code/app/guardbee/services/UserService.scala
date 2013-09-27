@@ -3,6 +3,7 @@ package guardbee.services
 import guardbee.utils.GuardbeeConfiguration
 import play.api.Application
 import org.joda.time.DateTime
+import guardbee.utils.GuardbeeError
 
 abstract class UserService(app: Application) extends BasePlugin with GuardbeeConfiguration {
 
@@ -11,11 +12,11 @@ abstract class UserService(app: Application) extends BasePlugin with GuardbeeCon
   def getUserByID(user_id: String): Option[User]
   def getUserPassword(user: User): Option[Password]
   def getUserGrants(user: User): Seq[String]
-  def saveUser(user: User): Either[Error, Unit]
-  def disableUser(user_id: String): Either[Error, Unit]
-  def enableUser(user_id: String, password: Option[Password] = None): Either[Error, User]
+  def saveUser(user: User): Either[GuardbeeError, Unit]
+  def disableUser(user_id: String): Either[GuardbeeError, Unit]
+  def enableUser(user_id: String, password: Option[Password] = None): Either[GuardbeeError, User]
 
-  def createDisabledUser(user_id: String, email: String): Either[Error, User] = {
+  def createDisabledUser(user_id: String, email: String): Either[GuardbeeError, User] = {
     val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None)
     saveUser(new_user) match {
       case Left(error) => Left(error)
@@ -62,22 +63,22 @@ object UserService extends ServiceCompanion[UserService] with GuardbeeConfigurat
     }
   }
 
-  def saveUser(user: User): Either[Error, Unit] = {
+  def saveUser(user: User): Either[GuardbeeError, Unit] = {
     getDelegate.map(_.saveUser(user)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
-  def disableUser(user_id: String): Either[Error, Unit] = {
+  def disableUser(user_id: String): Either[GuardbeeError, Unit] = {
     getDelegate.map(_.disableUser(user_id)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
   }
-  def enableUser(user_id: String, password: Option[Password] = None): Either[Error, User] = {
+  def enableUser(user_id: String, password: Option[Password] = None): Either[GuardbeeError, User] = {
     getDelegate.map(_.enableUser(user_id, password)) getOrElse {
       notInitialized
-      Left(Errors.InternalServerError)
+      Left(GuardbeeError.InternalServerError)
     }
 
   }
@@ -99,7 +100,7 @@ object UserService extends ServiceCompanion[UserService] with GuardbeeConfigurat
   }
 
   
-  def createDisabledUser(user_id: String, email: String): Either[Error, User] = {
+  def createDisabledUser(user_id: String, email: String): Either[GuardbeeError, User] = {
     val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None)
     saveUser(new_user) match {
       case Left(error) => Left(error)

@@ -30,8 +30,8 @@ import play.api.mvc.Cookie
 import play.api.Play
 import play.api.libs.Crypto
 import play.api.Logger
-import guardbee.services.Errors._
 import org.joda.time.DateTime
+import guardbee.utils.GuardbeeError
 
 trait Credentials
 
@@ -49,7 +49,7 @@ trait User {
 }
 
 
-abstract class AuthenticationProvider(app: Application) extends BasePlugin with Errors {
+abstract class AuthenticationProvider(app: Application) extends BasePlugin {
 
   type CredentialsType <: Credentials
 
@@ -59,24 +59,24 @@ abstract class AuthenticationProvider(app: Application) extends BasePlugin with 
 
   final val unique = false
 
-  def extractAuthToken(implicit request: Request[AnyContent]): Either[Error, AuthenticationToken]
-  def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[Error, Authentication]
+  def extractAuthToken(implicit request: Request[AnyContent]): Either[GuardbeeError, AuthenticationToken]
+  def authenticate(authToken: AuthenticationToken)(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication]
 
   def onLoginSuccess(authentication: Authentication)(implicit request: Request[AnyContent]): Result
   def onLoginFailure(implicit request: Request[AnyContent]): Result
   
   
-  def getAuthentication(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
+  def getAuthentication(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
     
     Authentication.getCookie flatMap {
       cookie =>
         AuthStoreProvider.get(cookie).filter(a => a.isExpired == false)
-    } toRight (AuthenticationRequiredError)
+    } toRight (GuardbeeError.AuthenticationRequiredError)
   }
   
   def isAuthenticated(implicit request: Request[AnyContent]): Boolean = getAuthentication.isRight
   
-  def handleAuthentication(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
+  def handleAuthentication(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
     for (
       token <- extractAuthToken.right;
       auth <- authenticate(token).right
@@ -153,14 +153,14 @@ object AuthenticationProvider extends ServiceCompanion[AuthenticationProvider] {
   
   def isAuthenticated(implicit request: Request[AnyContent]): Boolean = isAuthenticated(default)
 
-  def getAuthentication(provider: String)(implicit request: Request[AnyContent]): Either[Error, Authentication] = {
+  def getAuthentication(provider: String)(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
     getDelegate(provider).map(_.getAuthentication).getOrElse {
       notInitialized()
-      Left(AuthenticationRequiredError)
+      Left(GuardbeeError.AuthenticationRequiredError)
     }
   }
   
-  def getAuthentication(implicit request: Request[AnyContent]):  Either[Error, Authentication] = getAuthentication(default)
+  def getAuthentication(implicit request: Request[AnyContent]):  Either[GuardbeeError, Authentication] = getAuthentication(default)
   
   
   

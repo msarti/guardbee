@@ -6,13 +6,14 @@ import guardbee.services.ClientIDService
 import scala.util.Either
 import play.api.Application
 import guardbee.services.ClientID
-import guardbee.services.Error
 import guardbee.services.ClientIDAuthorization
 import guardbee.services.ClientIDAuthorization
 import guardbee.services.Scope
+import guardbee.utils.GuardbeeError
 
 case class SimpleCliendID(
   clientId: String,
+  title: String,
   description: String,
   userId: String,
   homePageUrl: Option[String],
@@ -40,6 +41,7 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
 
   def newClientId(
     clientId: String,
+    title: String,
     description: String,
     userId: String,
     homePageUrl: Option[String],
@@ -50,6 +52,7 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
     SimpleCliendID(
       clientId,
       description,
+      title,
       userId,
       homePageUrl,
       redirectURIs,
@@ -62,12 +65,12 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
     getItem[ClientID, String]("clientIds", clientId)
   }
 
-  def save(clientId: ClientID): Either[Error, Unit] = {
+  def save(clientId: ClientID): Either[GuardbeeError, Unit] = {
     saveItem[ClientID, String]("clientIds", clientId, clientId.clientId)
     Right()
   }
 
-  def delete(clientId: String): Either[Error, Unit] = {
+  def delete(clientId: String): Either[GuardbeeError, Unit] = {
     deleteItem[ClientID, String]("clientIds", clientId)
     Right()
   }
@@ -89,12 +92,12 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
   }
   
   
-  def saveAuthorization(clientId: ClientIDAuthorization): Either[Error, Unit] = {
+  def saveAuthorization(clientId: ClientIDAuthorization): Either[GuardbeeError, Unit] = {
     saveItem[ClientIDAuthorization, (String, String)]("clientIdAuthorizations", clientId, (clientId.clientId, clientId.userId))
     Right()
   }
 
-  def deleteAuthorization(clientId: String, userId: String): Either[Error, Unit] = {
+  def deleteAuthorization(clientId: String, userId: String): Either[GuardbeeError, Unit] = {
     deleteItem[ClientIDAuthorization, (String, String)]("clientIdAuthorizations", (clientId, userId))
     Right()
   }
@@ -104,7 +107,7 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
     scope: String,
     description: String): Scope = SimpleScope(scope, description)
 
-  def saveScope(scope: Scope): Either[Error, Unit] = {
+  def saveScope(scope: Scope): Either[GuardbeeError, Unit] = {
     saveItem[Scope, String]("scopes", scope, scope.scope)
     Right()
   }
@@ -113,7 +116,7 @@ class CacheClientIDService(app: Application) extends ClientIDService(app) with B
     getItem[Scope, String]("scopes", scope)
   }
 
-  def deleteScope(scope: String): Either[Error, Unit] = {
+  def deleteScope(scope: String): Either[GuardbeeError, Unit] = {
     deleteItem[Scope, String]("scopes", scope)
     Right()
   }

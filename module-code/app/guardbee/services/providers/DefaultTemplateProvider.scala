@@ -22,6 +22,8 @@ import play.api.templates.Html
 import guardbee.services.TemplateProvider
 import play.api.Application
 import play.api.mvc.Flash
+import play.api.mvc.Request
+import play.api.mvc.AnyContent
 
 class DefaultTemplateProvider(app: Application) extends TemplateProvider(app) {
 	val id = "defaultTemplates"
@@ -33,7 +35,7 @@ class DefaultTemplateProvider(app: Application) extends TemplateProvider(app) {
 	def appApprovalPage(title: String, 
 	    client_id: Option[guardbee.services.ClientID], 
 	    scope: Seq[Option[guardbee.services.Scope]], 
-	    auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token): Html =
+	    auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token, request: Request[AnyContent]): Html =
 	      guardbee.views.html.app_approval(title, client_id, scope, auth_code)
 
 }
