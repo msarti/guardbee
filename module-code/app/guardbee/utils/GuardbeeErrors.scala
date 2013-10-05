@@ -7,8 +7,9 @@ import play.api.libs.json.Json
 import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.http.Status
+import guardbee.utils.i18n._
 
-case class GuardbeeError(error_code: String, messages: Seq[(String, Seq[Any])], status: Int) {
+case class GuardbeeError(error_code: String, messages: Seq[GuardbeeMessage], status: Int) {
   def apply[A](mimeType: String)(implicit request: Request[A]) = {
     mimeType match {
       case MimeTypes.JSON => toJson
@@ -18,14 +19,14 @@ case class GuardbeeError(error_code: String, messages: Seq[(String, Seq[Any])], 
   private def toJson[A](implicit request: Request[A]) = {
     val m = messages.map {
       message =>
-        Json.obj("message" -> Messages(message._1, message._2: _*))
+        Json.obj("message" -> message())
     }
     Results.Status(status)(Json.obj("error" -> Json.obj("code" -> error_code, "messages" -> m)))
   }
 
   private def toHtml[A](implicit request: Request[A]) = {
     val m = messages.zipWithIndex.map {
-      case (p, i) => ("message" + i, Messages(p._1, p._2: _*))
+      case (p, i) => ("message" + i, p())
     }
     Results.Redirect(RoutesHelper.errorPage(status)).flashing("errorCode"->error_code)
     .flashing(m:_*)
@@ -34,21 +35,21 @@ case class GuardbeeError(error_code: String, messages: Seq[(String, Seq[Any])], 
 }
 
 object GuardbeeError {
-  def apply(status: Int, error_code: String, formErrors: Seq[FormError]): GuardbeeError = {
+  def apply[A](status: Int, error_code: String, formErrors: Seq[FormError]): GuardbeeError = {
     val m = formErrors.map({
       error =>
-        (error.message, Seq(error.key))
+        GuardbeeMessages.Message(error.message, error.key)
     })
     GuardbeeError(error_code, m, status)
   }
   
-  val InvalidAuthCodeError = GuardbeeError("", Seq(("", Seq[Any]())), Status.BAD_REQUEST)
-  val InternalServerError = GuardbeeError("", Seq(("", Seq[Any]())), Status.BAD_REQUEST)
-  val RevokeAccessTokenError = GuardbeeError("", Seq(("", Seq[Any]())), Status.BAD_REQUEST)
-  val AuthenticationRequiredError = GuardbeeError("", Seq(("", Seq[Any]())), Status.UNAUTHORIZED)
-  val InvalidAuthTokenError = GuardbeeError("", Seq(("", Seq[Any]())), Status.UNAUTHORIZED)
-  val InvalidCredentialsError = GuardbeeError("", Seq(("", Seq[Any]())), Status.UNAUTHORIZED)
-  val AuthenticationError = GuardbeeError("", Seq(("", Seq[Any]())), Status.UNAUTHORIZED)
-  val UserNotFoundError = GuardbeeError("", Seq(("", Seq[Any]())), Status.UNAUTHORIZED)
-  val AccessDeniedError = GuardbeeError("", Seq(("", Seq[Any]())), Status.UNAUTHORIZED)
+  val InvalidAuthCodeError = GuardbeeError("", Seq(GuardbeeMessages.InvalidAuthCode), Status.BAD_REQUEST)
+  val InternalServerError = GuardbeeError("", Seq(GuardbeeMessages.InternalServerError), Status.BAD_REQUEST)
+  val RevokeAccessTokenError = GuardbeeError("", Seq(GuardbeeMessages.RevokeAccessTokenError), Status.BAD_REQUEST)
+  val AuthenticationRequiredError = GuardbeeError("", Seq(GuardbeeMessages.AuthenticationRequired), Status.UNAUTHORIZED)
+  val InvalidAuthTokenError = GuardbeeError("", Seq(GuardbeeMessages.InvalidOAuth2Token), Status.UNAUTHORIZED)
+  val InvalidCredentialsError = GuardbeeError("", Seq(GuardbeeMessages.InvalidCredentials), Status.UNAUTHORIZED)
+  val AuthenticationError = GuardbeeError("", Seq(GuardbeeMessages.AuthenticationError), Status.UNAUTHORIZED)
+  val UserNotFoundError = GuardbeeError("", Seq(GuardbeeMessages.UserNotFound), Status.UNAUTHORIZED)
+  val AccessDeniedError = GuardbeeError("", Seq(GuardbeeMessages.AccessDenied), Status.UNAUTHORIZED)
 }

@@ -5,7 +5,6 @@ import play.api.mvc.Results
 import guardbee.services._
 import play.api.mvc._
 import views.html.defaultpages.badRequest
-import guardbee.utils.GuardbeeMessages
 import guardbee.utils.GuardbeeError
 
 case class OAuth2Token(token_type:String, token:String) extends Credentials

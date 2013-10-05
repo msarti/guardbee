@@ -1,6 +1,7 @@
 @(title: String, client_id: Option[guardbee.services.ClientID], scope: Seq[Option[guardbee.services.Scope]], auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token, request: play.api.mvc.Request[play.api.mvc.AnyContent]) 
 @import helper._
 @import play.filters._
+@import guardbee.utils.i18n._
 @import guardbee.utils._
 @import play.api.mvc._
 @guardbee.views.html.simplebase(title) {
@@ -19,7 +20,7 @@ $(document).ready(function(){
 </script>
 <div class="container">
 	@client_id.map { c =>
-	<span>@Html(GuardbeeMessages.AppApproval(c.title))</span>
+	<span>@Html(GuardbeeMessages.AppApproval(c.title)())</span>
 	}
 	<table class="table table-hover">
 	@scope.map { s => 

@@ -20,9 +20,9 @@ import java.net.URI
 import java.net.URL
 import play.api.mvc.Action
 import play.api.libs.json.Json
-import guardbee.utils.GuardbeeErrorMessages
 import play.api.mvc.Request
 import guardbee.utils.GuardbeeError
+import guardbee.utils.i18n.GuardbeeMessages
 
 object AuthorizationServerController extends Controller with Secured {
 
@@ -97,6 +97,7 @@ object AuthorizationServerController extends Controller with Secured {
         errors =>
           val e = errors.errors
           Logger.info(e.mkString("-"))
+          
           GuardbeeError(BAD_REQUEST, "", e)(MimeTypes.HTML)
       }, {
         success =>
@@ -186,21 +187,21 @@ object AuthorizationServerController extends Controller with Secured {
           "client_id" -> text,
           "client_secret" -> text,
           "redirect_uri" -> text,
-          "grant_type" -> text.verifying(GuardbeeErrorMessages.InvalidGrantType(), {g => g == "authorization_code"})
+          "grant_type" -> text.verifying(GuardbeeMessages.InvalidGrantType(), {g => g == "authorization_code"})
           )(TokenForm.apply)(TokenForm.unapply)
-          .verifying(GuardbeeErrorMessages.InvalidAuthCode(), {f => f.getCode.isDefined})
-          .verifying(GuardbeeErrorMessages.InvalidClientID(), {f => f.getClientID.isDefined})
-          .verifying(GuardbeeErrorMessages.InvalidClientID(), {f => 
+          .verifying(GuardbeeMessages.InvalidAuthCodeKey, {f => f.getCode.isDefined})
+          .verifying(GuardbeeMessages.InvalidClientIDKey, {f => f.getClientID.isDefined})
+          .verifying(GuardbeeMessages.InvalidClientIDKey, {f => 
             f.getCode.map { c =>
               c.client_id == f.client_id
             }.getOrElse(false)
           })
-          .verifying(GuardbeeErrorMessages.InvalidSecret(), {f => 
+          .verifying(GuardbeeMessages.InvalidSecret(), {f => 
             f.getClientID.map { c =>
               c.secret == f.client_secret
             }.getOrElse(false)
           })
-          .verifying(GuardbeeErrorMessages.InvalidRedirectUri(""), {f => 
+          .verifying(GuardbeeMessages.InvalidRedirectUriKey, {f => 
             f.getCode.map { c =>
               c.redirect_uri == f.redirect_uri
             }.getOrElse(false)
