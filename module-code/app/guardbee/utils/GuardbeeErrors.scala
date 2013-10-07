@@ -8,6 +8,7 @@ import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.http.Status
 import guardbee.utils.i18n._
+import play.api.mvc.Result
 
 case class GuardbeeError(error_code: String, messages: Seq[GuardbeeMessage], status: Int) {
   def apply[A](mimeType: String)(implicit request: Request[A]) = {
@@ -24,7 +25,7 @@ case class GuardbeeError(error_code: String, messages: Seq[GuardbeeMessage], sta
     Results.Status(status)(Json.obj("error" -> Json.obj("code" -> error_code, "messages" -> m)))
   }
 
-  private def toHtml[A](implicit request: Request[A]) = {
+  protected def toHtml[A](implicit request: Request[A]) = {
     val m = messages.zipWithIndex.map {
       case (p, i) => ("message" + i, p())
     }
@@ -46,7 +47,9 @@ object GuardbeeError {
   val InvalidAuthCodeError = GuardbeeError("", Seq(GuardbeeMessages.InvalidAuthCode), Status.BAD_REQUEST)
   val InternalServerError = GuardbeeError("", Seq(GuardbeeMessages.InternalServerError), Status.BAD_REQUEST)
   val RevokeAccessTokenError = GuardbeeError("", Seq(GuardbeeMessages.RevokeAccessTokenError), Status.BAD_REQUEST)
-  val AuthenticationRequiredError = GuardbeeError("", Seq(GuardbeeMessages.AuthenticationRequired), Status.UNAUTHORIZED)
+  object AuthenticationRequiredError extends GuardbeeError("", Seq(GuardbeeMessages.AuthenticationRequired), Status.UNAUTHORIZED) {
+        override def toHtml[A](implicit request: Request[A]) = Results.Redirect(RoutesHelper.loginPage(request.uri))
+  }
   val InvalidAuthTokenError = GuardbeeError("", Seq(GuardbeeMessages.InvalidOAuth2Token), Status.UNAUTHORIZED)
   val InvalidCredentialsError = GuardbeeError("", Seq(GuardbeeMessages.InvalidCredentials), Status.UNAUTHORIZED)
   val AuthenticationError = GuardbeeError("", Seq(GuardbeeMessages.AuthenticationError), Status.UNAUTHORIZED)

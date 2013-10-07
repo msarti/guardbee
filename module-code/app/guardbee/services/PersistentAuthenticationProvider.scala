@@ -5,8 +5,9 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Result
 import play.api.mvc.Results
 import guardbee.utils.GuardbeeError
+import play.api.Application
 
-abstract class PersistentAuthenticationProvider extends BasePlugin {
+abstract class PersistentAuthenticationProvider(application: Application) extends BasePlugin {
   type CredentialsType <: Credentials
 
   case class AuthenticationToken(
@@ -73,5 +74,24 @@ object PersistentAuthenticationProvider extends ServiceCompanion[PersistentAuthe
   val Unique = true;
   val serviceName = "persistentAuthenticationProvider";
   val default = "";
+  
+  def getAuthentication(implicit request: Request[AnyContent]): Either[GuardbeeError, Authentication] = {
+    getDelegate.map(_.getAuthentication).getOrElse(Left(GuardbeeError.InternalServerError))
+  }
+  
+  def handleLogin(implicit request: Request[AnyContent]): Result = {
+    getDelegate.map(_.handleLogin).getOrElse({
+      notInitialized
+      Results.BadRequest
+    })
+  }
+  
+  def handleLogout(implicit request: Request[AnyContent]): Result = {
+    getDelegate.map(_.handleLogout).getOrElse({
+      notInitialized
+      Results.BadRequest
+    })
+  }
+  
 
 }

@@ -18,7 +18,6 @@
 
 package guardbee.services.providers
 
-import guardbee.services.AuthenticationProvider
 import play.api.Application
 import guardbee.services.PasswordProvider
 import scala.util.Right
@@ -43,14 +42,16 @@ import play.api.libs.json.Json
 import guardbee.utils.RoutesHelper
 import guardbee.services.UserService
 import guardbee.utils.GuardbeeError
+import guardbee.services.PersistentAuthenticationProvider
 case class PlainPassword(password: String, rememberMe: Boolean) extends Credentials
 
 class UsernamePasswordAuthenticationProvider(application: Application)
-  extends AuthenticationProvider(application)  {
+  extends PersistentAuthenticationProvider(application)  {
 
   type CredentialsType = PlainPassword
 
   val id = "usernamepassword"
+  val unique = true;
 
   val form = Form(
     mapping(

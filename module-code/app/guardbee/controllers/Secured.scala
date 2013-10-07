@@ -18,7 +18,6 @@
 package guardbee.controllers
 
 import guardbee.services.Authentication
-import guardbee.services.AuthenticationProvider
 import play.api.http.MimeTypes
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -26,6 +25,8 @@ import play.api.mvc.Controller
 import play.api.mvc.Request
 import play.api.mvc.Result
 import guardbee.utils.GuardbeeError
+import guardbee.services.PersistentAuthenticationProvider
+import guardbee.services.OAuth2AuthenticationProvider
 
 trait Secured extends Controller  {
   
@@ -33,12 +34,15 @@ trait Secured extends Controller  {
   
   
   
-  def authorized(provider: Option[String] = None, responseType: String = MimeTypes.HTML, authorization: Option[Authentication] => Either[GuardbeeError, Unit])
+  def authorized(provider: Option[String] = Some(PersistentAuthenticationProvider.serviceName), responseType: String = MimeTypes.HTML, authorization: Option[Authentication] => Either[GuardbeeError, Unit])
   (action: => Request[AnyContent] => Authentication => Result) = Action {
     implicit request =>
 
-      val authentication =
-      provider.map(AuthenticationProvider.getAuthentication(_)).getOrElse(AuthenticationProvider.getAuthentication)
+      val authentication = provider match {
+        case Some(PersistentAuthenticationProvider.serviceName) => PersistentAuthenticationProvider.getAuthentication
+        case Some(OAuth2AuthenticationProvider.serviceName) => OAuth2AuthenticationProvider.performAuthentication
+        case _ => Left(GuardbeeError.InternalServerError)
+      }
       
       authentication match {
         case Left(error) => error(responseType)

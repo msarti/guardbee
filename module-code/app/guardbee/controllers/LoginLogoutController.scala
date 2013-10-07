@@ -20,12 +20,12 @@ import play.api.mvc.Controller
 import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
-import guardbee.services.AuthenticationProvider
 import play.api.Logger
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import guardbee.services.TemplateProvider
 import play.api.mvc.Cookie
+import guardbee.services.PersistentAuthenticationProvider
 
 
 
@@ -33,12 +33,11 @@ object LoginLogoutController extends Controller {
 
 
   def doLogin = Action { implicit request =>
-    AuthenticationProvider.handleLogin("usernamepassword")
+    PersistentAuthenticationProvider.handleLogin
   }
 
   def doLogout = Action { implicit request =>
-    AuthenticationProvider.handleLogout
-
+    PersistentAuthenticationProvider.handleLogout
   }
   
   def loginPage(destPage: String) = Action { implicit request =>

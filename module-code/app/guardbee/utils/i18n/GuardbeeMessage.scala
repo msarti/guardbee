@@ -57,7 +57,7 @@ trait GuardbeeMessages extends GuardbeeMessagesBase {
   val AuthenticationRequiredKey = errorKey + ".authenticationRequired"
   val AuthenticationRequired = Message(AuthenticationRequiredKey)
 
-  val AuthenticationErrorKey = errorKey + ".authenticationErrorKey"
+  val AuthenticationErrorKey = errorKey + ".authenticationError"
   val AuthenticationError = Message(AuthenticationErrorKey)
 
   val UserNotFoundKey = errorKey + ".userNotFoundKey"
