@@ -1,12 +1,12 @@
 import sbt._
 import Keys._
 import play.Project._
-import com.typesafe.sbt.SbtAtmos.atmosSettings
 
 object ApplicationBuild extends Build {
 
+  val appOrganization = "com.elogiclab"
   val appName         = "guardbee"
-  val appVersion      = "master-SNAPSHOT"
+  val appVersion      = "0.1-SNAPSHOT"
 
   val appDependencies = Seq(
     // Select Play modules
@@ -17,9 +17,10 @@ object ApplicationBuild extends Build {
     //javaJpa,   // Java JPA plugin
     filters,   // A set of built-in filters
     javaCore,  // The core Java API
+    cache,
   
     // WebJars pull in client-side web libraries
-    "org.webjars" % "webjars-play" % "2.1.0",
+    "org.webjars" %% "webjars-play" % "2.2.0",
     "org.webjars" % "bootstrap" % "2.3.2",
     "org.webjars" % "font-awesome" % "3.2.1",
     "org.mindrot" % "jbcrypt" % "0.3m"
@@ -29,7 +30,8 @@ object ApplicationBuild extends Build {
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    scalaVersion := "2.10.1"
+    scalaVersion := "2.10.1",
+    organization := appOrganization
     // Add your own project settings here      
   )
 

@@ -1,17 +1,10 @@
-2000:com.elogiclab.guardbee.controller.DefaultTemplatesPlugin
-2001:com.elogiclab.guardbee.service.DefaultClientAppService
-2002:com.elogiclab.guardbee.service.DefaultScopeService
-2003:com.elogiclab.guardbee.service.DefaultUserGrantService
-2004:com.elogiclab.guardbee.service.DefaultAuthCodeService
-2005:com.elogiclab.guardbee.service.DefaultAccessTokenService
-2005:com.elogiclab.guardbee.service.DefaultUserService
+1000:guardbee.services.providers.UsernamePasswordAuthenticationProvider
+1001:guardbee.services.providers.DefaultOAuth2AuthenticationProvider
+1002:guardbee.services.providers.BcryptPasswordProvider
+1003:guardbee.services.providers.CacheUserService
+1004:guardbee.services.providers.CacheAccessTokenService
+1005:guardbee.services.providers.CacheAuthStoreProvider
+1006:guardbee.services.providers.DefaultTemplateProvider
+1007:guardbee.services.providers.CacheClientIDService
 
-1500:com.typesafe.plugin.CommonsMailerPlugin
-9995:securesocial.core.DefaultAuthenticatorStore
-9996:securesocial.core.providers.utils.DefaultPasswordValidator
-9997:securesocial.controllers.DefaultTemplatesPlugin
-9998:securesocial.core.DefaultIdGenerator
-9999:securesocial.core.providers.utils.BCryptPasswordHasher
-10004:securesocial.core.providers.UsernamePasswordProvider
 
-10005:com.elogiclab.guardbee.auth.providers.SecureSocialWrapperService

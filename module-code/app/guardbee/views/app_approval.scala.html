@@ -1,6 +1,5 @@
-@(title: String, client_id: Option[guardbee.services.ClientID], scope: Seq[Option[guardbee.services.Scope]], auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token, request: play.api.mvc.Request[play.api.mvc.AnyContent]) 
+@(title: String, client_id: Option[guardbee.services.ClientID], scope: Seq[Option[guardbee.services.Scope]], auth_code: Option[guardbee.services.AuthCode])(implicit request: play.api.mvc.Request[play.api.mvc.AnyContent]) 
 @import helper._
-@import play.filters._
 @import guardbee.utils.i18n._
 @import guardbee.utils._
 @import play.api.mvc._
@@ -8,12 +7,12 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	$("#approve-button").click( function() {
-	    $("#approval-form").attr('action', '@Html(CSRF(RoutesHelper.approve(true)).toString)');
+	    $("#approval-form").attr('action', '@Html(RoutesHelper.approve(true).toString)');
 	    $("#approval-form").submit();
 	});
 	
 	$("#reject-button").click( function() {
-	    $("#approval-form").attr('action', '@Html(CSRF(RoutesHelper.approve(false)).toString)');
+	    $("#approval-form").attr('action', '@Html(RoutesHelper.approve(false).toString)');
 	    $("#approval-form").submit();
 	});
 });

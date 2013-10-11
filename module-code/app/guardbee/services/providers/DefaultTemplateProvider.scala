@@ -28,14 +28,14 @@ import play.api.mvc.AnyContent
 class DefaultTemplateProvider(app: Application) extends TemplateProvider(app) {
 	val id = "defaultTemplates"
 	
-	def loginPage()(implicit flash: Flash, token: play.filters.csrf.CSRF.Token): Html = guardbee.views.html.login()
+	def loginPage()(implicit flash: Flash): Html = guardbee.views.html.login()
 	
 	def errorPage(title:String, messages:Seq[String]): Html = guardbee.views.html.error(title, messages)
 	
 	def appApprovalPage(title: String, 
 	    client_id: Option[guardbee.services.ClientID], 
 	    scope: Seq[Option[guardbee.services.Scope]], 
-	    auth_code: Option[guardbee.services.AuthCode])(implicit token: play.filters.csrf.CSRF.Token, request: Request[AnyContent]): Html =
+	    auth_code: Option[guardbee.services.AuthCode])(implicit request: Request[AnyContent]): Html =
 	      guardbee.views.html.app_approval(title, client_id, scope, auth_code)
 
 }

@@ -1,4 +1,4 @@
-@()(implicit flash: play.api.mvc.Flash, token: play.filters.csrf.CSRF.Token)
+@()(implicit flash: play.api.mvc.Flash)
 @import play.api.mvc._
 @import helper._
 @guardbee.views.html.simplebase("Login") {
@@ -11,7 +11,7 @@
                 <a class="close" data-dismiss="alert" href="#">×</a>@message
             </div>
             }
-            @form(CSRF(guardbee.controllers.routes.LoginLogoutController.doLogin())) {
+            @form(guardbee.utils.RoutesHelper.doLogin()) {
 			<input type="text" id="username" class="span4" name="username" placeholder="Username">
 			<input type="password" id="password" class="span4" name="password" placeholder="Password">
             <label class="checkbox">
