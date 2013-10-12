@@ -3,10 +3,9 @@
 # ~~~~
 
 GET     /                           controllers.MainController.index()
-#GET     /authorized                     controllers.MainController.myAuth()
-#GET     /testoauth                     controllers.MainController.oauth()
 GET     /message                    controllers.MessageController.getMessage()
-#GET		/code						controllers.MainController.code(code: Option[String], error: Option[String])
+GET		/api/getProfile				controllers.MainController.getProfile()
+
 
 GET     /assets/javascripts/routes  controllers.MessageController.javascriptRoutes()
 

@@ -28,6 +28,8 @@ import play.api.mvc.Action
 import play.api.libs.ws.WS
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext
+import guardbee.services.OAuth2AuthenticationProvider
+import play.api.libs.json.Json
 
 object MainController extends Controller with Secured {
 
@@ -36,41 +38,17 @@ object MainController extends Controller with Secured {
     Ok(views.html.index(""))
   }
 
-  def myAuth = authorized(authorization = hasRole("ROLE_ADMIN")) { implicit request =>
-    user =>
-      Ok("OK")
-  }
-
-  def oauth = authorized(provider = Some("OAuth2"),
-    responseType = MimeTypes.JSON,
-    authorization = hasScope("get_profil", "ROLE_ADMIN")) { implicit request =>
-      user =>
-        Ok(user.user.user_id)
+  def getProfile = authorized(provider = Some(OAuth2AuthenticationProvider.serviceName),
+    authorization = hasScope("getProfile"), responseType = MimeTypes.JSON) { implicit request =>
+      authorization =>
+        val user = authorization.user
+        
+        Ok(Json.obj("user_id"->user.user_id, 
+            "avatar_url" -> user.avatar_url,
+            "bio" -> user.bio,
+            "email" -> user.email,
+            "full_name" -> user.full_name,
+            "home_page" -> user.home_page))
     }
-
-  def code(code: Option[String], error: Option[String]) = Action {
-    import ExecutionContext.Implicits.global
-    val url = "http://localhost:9000/oauth2/token"
-    val queryString = Map("code" -> Seq(code.getOrElse("")), 
-        "grant_type" -> Seq("access_token"),
-        "client_id" -> Seq("clientId"),
-        "client_secret" -> Seq("secret"),
-        "redirect_uri" -> Seq("http://localhost:9000/code")
-        )
-
-    val fullUrl = url + Option(queryString).filterNot(_.isEmpty).map { params =>
-      (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap { pair =>
-        pair._2.map(value => (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
-      }.mkString("&")
-    }.getOrElse("")
-    Async {
-      WS.url(fullUrl).get().map { response =>
-        response.status match {
-          case 200 => Ok("Token: " + (response.json \ "access_token").as[String])
-          case _ => Ok(response.body)
-        }
-      }
-    }
-  }
 
 }
