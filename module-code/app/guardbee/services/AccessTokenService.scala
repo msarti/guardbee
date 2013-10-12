@@ -82,11 +82,11 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
   }
 
   def issueAccessToken(user_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
-    val new_token = newAccessToken(UUID.randomUUID.toString,
+    val new_token = newAccessToken(TokenProvider.generate,
       "Bearer",
       scope,
       DateTime.now.plusSeconds(OAuth2AccessTokenExpiresIn),
-      UUID.randomUUID.toString,
+      TokenProvider.generate,
       DateTime.now.plusSeconds(OAuth2RefreshTokenExpiresIn),
       user_id,
       false,

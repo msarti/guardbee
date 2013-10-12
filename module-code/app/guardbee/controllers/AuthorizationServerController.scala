@@ -46,7 +46,7 @@ object AuthorizationServerController extends Controller with Secured {
   }
 
   def generateToken = {
-    "123456"
+    TokenProvider.generate
   }
 
   def validateRedirectURI(redirect_uri: String, client_id: ClientID) = {
