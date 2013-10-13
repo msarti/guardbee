@@ -12,12 +12,13 @@ abstract class UserService(app: Application) extends BasePlugin with GuardbeeCon
   def getUserByID(user_id: String): Option[User]
   def getUserPassword(user: User): Option[Password]
   def getUserGrants(user: User): Seq[String]
+  def setUserGrants(user_id: String, grants: Seq[String]): Either[GuardbeeError, Unit]
   def saveUser(user: User): Either[GuardbeeError, Unit]
   def disableUser(user_id: String): Either[GuardbeeError, Unit]
   def enableUser(user_id: String, password: Option[Password] = None): Either[GuardbeeError, User]
 
-  def createDisabledUser(user_id: String, email: String): Either[GuardbeeError, User] = {
-    val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None)
+  def createDisabledUser(user_id: String, email: String, roles: Seq[String]): Either[GuardbeeError, User] = {
+    val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None, roles)
     saveUser(new_user) match {
       case Left(error) => Left(error)
       case Right(unit) => Right(new_user)
@@ -31,7 +32,8 @@ abstract class UserService(app: Application) extends BasePlugin with GuardbeeCon
     full_name: Option[String],
     avatar_url: Option[String],
     bio: Option[String],
-    home_page: Option[String]): User
+    home_page: Option[String],
+    roles: Seq[String]): User
 
   override def onStart() = {
     UserService.setService(this)
@@ -90,18 +92,19 @@ object UserService extends ServiceCompanion[UserService] with GuardbeeConfigurat
     full_name: Option[String],
     avatar_url: Option[String],
     bio: Option[String],
-    home_page: Option[String]): User = {
+    home_page: Option[String],
+    roles: Seq[String]): User = {
 
     getDelegate.map(
-      _.newUser(user_id, email, created_on, enabled, full_name, avatar_url, bio, home_page)) getOrElse {
+      _.newUser(user_id, email, created_on, enabled, full_name, avatar_url, bio, home_page, roles)) getOrElse {
         notInitialized
         null
       }
   }
 
   
-  def createDisabledUser(user_id: String, email: String): Either[GuardbeeError, User] = {
-    val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None)
+  def createDisabledUser(user_id: String, email: String, roles:Seq[String] = Seq(GuardbeeConfiguration.DefaultUserRole)): Either[GuardbeeError, User] = {
+    val new_user = newUser(user_id, email, DateTime.now, false, None, None, None, None, roles)
     saveUser(new_user) match {
       case Left(error) => Left(error)
       case Right(unit) => Right(new_user)

@@ -11,6 +11,7 @@ trait User {
   def avatar_url: Option[String]
   def bio: Option[String]
   def home_page: Option[String] 
+  def roles: Seq[String]
 }
 
 trait Credentials

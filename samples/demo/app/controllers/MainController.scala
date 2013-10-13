@@ -39,7 +39,7 @@ object MainController extends Controller with Secured {
   }
 
   def getProfile = authorized(provider = Some(OAuth2AuthenticationProvider.serviceName),
-    authorization = hasScope("getProfile"), responseType = MimeTypes.JSON) { implicit request =>
+    authorization = hasScope("getProfile", "ROLE_USER"), responseType = MimeTypes.JSON) { implicit request =>
       authorization =>
         val user = authorization.user
         

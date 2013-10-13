@@ -5,9 +5,10 @@ import play.api.Play
 
 trait GuardbeeConfiguration {
 
-  lazy val DefaultGuardbeeService = Play.configuration.getString("guardbee.defaultService")
-    .getOrElse("defaultGuardbeeService")
-
+  lazy val DefaultUserRole = Play.configuration.getString("guardbee.defaultUserRole")
+    .getOrElse("ROLE_USER")
+    
+    
   lazy val OAuth2AccessTokenExpiresIn = Play.configuration.getInt("guardbee.oauth2.accessTokenExpiresIn")
     .getOrElse(3600)
 
@@ -15,10 +16,10 @@ trait GuardbeeConfiguration {
     .getOrElse(2592000)
 
   lazy val OAuth2SpecialURI = Play.configuration.getString("guardbee.oauth2.specialURI")
-  .getOrElse("urn:ietf:wg:oauth:2.0:oob")
+    .getOrElse("urn:ietf:wg:oauth:2.0:oob")
 
   lazy val OAuth2AlwaysAllowRedirectToLocalhost = Play.configuration.getBoolean("guardbee.oauth2.alwaysAllowRedirectToLocalhost")
-  .getOrElse(false)
+    .getOrElse(false)
 
 }
 

@@ -10,7 +10,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application): Unit = {
     
     Logger.info("Starting application")
-    val user = UserService.createDisabledUser("admin@example.org", "admin@example.org").fold({
+    val user = UserService.createDisabledUser("admin@example.org", "admin@example.org", Seq("ROLE_USER", "ROLE_ADMIN")).fold({
       e =>
 
     }, {

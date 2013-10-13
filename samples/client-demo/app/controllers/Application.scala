@@ -4,6 +4,7 @@ import play.api.mvc.{ Action, Controller }
 import play.api.libs.ws.WS
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import play.api.Logger
 
 object Application extends Controller {
   def index = Action {
@@ -33,6 +34,7 @@ object Application extends Controller {
           "grant_type" -> "authorization_code").get().map {
           response => 
             val access_token = response.json \ "access_token"
+            Logger.info("token: "+access_token)
             Redirect(state.getOrElse("/"))
         }
 
