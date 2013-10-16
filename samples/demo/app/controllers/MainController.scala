@@ -30,25 +30,26 @@ import java.net.URLEncoder
 import scala.concurrent.ExecutionContext
 import guardbee.services.OAuth2AuthenticationProvider
 import play.api.libs.json.Json
+import play.filters.csrf.CSRFAddToken
 
 object MainController extends Controller with Secured {
 
-  def index() = Action { implicit request =>
-
-    Ok(views.html.index(""))
-  }
+  def index() =
+      Action { implicit request =>
+        Ok(views.html.index(""))
+    }
 
   def getProfile = authorized(provider = Some(OAuth2AuthenticationProvider.serviceName),
     authorization = hasScope("getProfile", "ROLE_USER"), responseType = MimeTypes.JSON) { implicit request =>
       authorization =>
         val user = authorization.user
-        
-        Ok(Json.obj("user_id"->user.user_id, 
-            "avatar_url" -> user.avatar_url,
-            "bio" -> user.bio,
-            "email" -> user.email,
-            "full_name" -> user.full_name,
-            "home_page" -> user.home_page))
+
+        Ok(Json.obj("user_id" -> user.user_id,
+          "avatar_url" -> user.avatar_url,
+          "bio" -> user.bio,
+          "email" -> user.email,
+          "full_name" -> user.full_name,
+          "home_page" -> user.home_page))
     }
 
 }

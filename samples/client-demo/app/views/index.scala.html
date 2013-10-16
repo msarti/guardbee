@@ -1,9 +1,15 @@
-@(message: String)
+@(user: Option[Map[String, String]])
 
 @main("Welcome to Play Framework") {
 
+	@user.map { m =>
     <div class="well">
-        <h1>@message</h1>
+        <h1>@m.get("email").getOrElse("") Logged in!</h1>
     </div>
+    }.getOrElse {
+    <div class="well">
+        <h1>Not logged in - <a href="@routes.Application.login()">login</a></h1>
+    </div>
+    }
 
 }

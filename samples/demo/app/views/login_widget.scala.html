@@ -1,4 +1,4 @@
-@()(implicit token: play.filters.csrf.CSRF.Token)
+@()
 @import helper._
 <li class="dropdown">
 	<a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
@@ -38,7 +38,7 @@
 
 
 		</script>
-		@form(CSRF(guardbee.controllers.routes.LoginLogoutController.doLogin()), 'id -> "login-form") {
+		@form(guardbee.controllers.routes.LoginLogoutController.doLogin(), 'id -> "login-form") {
 			<div id="login-error"></div>
 			<div class="control-group">
 				<div class="controls"><input style="margin-bottom: 15px;" type="text" placeholder="Username" id="username" name="username"></div>
