@@ -19,6 +19,7 @@ case class SimpleAccessToken(
   refresh_token: String,
   refresh_token_expiration: DateTime,
   user_id: String,
+  client_id: String,
   issued_on: DateTime,
   revoked: Boolean,
   revoked_on: Option[DateTime]) extends AccessToken
@@ -52,6 +53,7 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
     refresh_token: String,
     refresh_token_expiration: DateTime,
     user_id: String,
+    client_id: String,
     revoked: Boolean = false,
     issued_on: DateTime = DateTime.now,
     revoked_on: Option[DateTime] = None): AccessToken = {
@@ -63,6 +65,7 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
       refresh_token,
       refresh_token_expiration,
       user_id,
+      client_id,
       issued_on,
       revoked,
       revoked_on)
@@ -73,10 +76,18 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
   }
   def saveAccessToken(access_token: AccessToken): Either[GuardbeeError, Unit] = {
     saveItem[AccessToken, String]("accessTokens", access_token, access_token.access_token)
+    saveItem[AccessToken, String]("refreshTokens", access_token, access_token.refresh_token)
     Right()
 
   }
   def deleteAccessToken(token: String): Either[GuardbeeError, Unit] = {
+    getAccessToken(token).map {
+      t =>
+      deleteItem[AccessToken, String]("accessTokens", t.access_token)
+      deleteItem[AccessToken, String]("refreshTokens", t.refresh_token)
+      
+    }
+    
     deleteItem[AccessToken, String]("accessTokens", token)
     Right()
   }
@@ -121,6 +132,10 @@ class CacheAccessTokenService(app: Application) extends AccessTokenService(app) 
       expire_on,
       approval_prompt,
       state)
+  }
+  
+  def getAccessTokenByRefreshToken(refresh_token: String): Option[AccessToken] = {
+    getItem[AccessToken, String]("refreshTokens", refresh_token)
   }
 
 }

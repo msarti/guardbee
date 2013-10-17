@@ -19,6 +19,6 @@ GET	   /error/:status				guardbee.controllers.ErrorPagesController.errorPage(sta
 
 GET	   /oauth2/auth				guardbee.controllers.AuthorizationServerController.code
 POST	   /oauth2/approve			guardbee.controllers.AuthorizationServerController.approve(approve: Boolean ?= true)
-GET	   /oauth2/token				guardbee.controllers.AuthorizationServerController.token
+POST	   /oauth2/token				guardbee.controllers.AuthorizationServerController.token
 
 

@@ -15,14 +15,19 @@ trait AccessToken {
   def refresh_token: String
   def refresh_token_expiration: DateTime
   def user_id: String
+  def client_id: String
   def issued_on: DateTime
   def revoked: Boolean
   def revoked_on: Option[DateTime]
 
   def isAccessTokenExpired = access_token_expiration.isBefore(DateTime.now)
   def isRefreshTokenExpired = refresh_token_expiration.isBefore(DateTime.now)
+  def isClientIDAuthorized = ClientIDService.findAuthorization(client_id, user_id).map{
+    s => scope.diff(s.scope).isEmpty //scopes in token cannot be more than
+    								 //authorized scopes
+  }.getOrElse(false)
 
-  def isValid = !isAccessTokenExpired && !revoked
+  def isValid = !isAccessTokenExpired && !revoked && isClientIDAuthorized
   
   lazy val expires_in = Minutes.minutesBetween(issued_on, access_token_expiration).getMinutes
 }
@@ -52,6 +57,7 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
   }
 
   def getAccessToken(token: String): Option[AccessToken]
+  def getAccessTokenByRefreshToken(refresh_token: String): Option[AccessToken]
   def saveAccessToken(access_token: AccessToken): Either[GuardbeeError, Unit]
   def deleteAccessToken(token: String): Either[GuardbeeError, Unit]
   def newAccessToken(
@@ -62,6 +68,7 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
     refresh_token: String,
     refresh_token_expiration: DateTime,
     user_id: String,
+    client_id: String,
     revoked: Boolean = false,
     issued_on: DateTime = DateTime.now,
     revoked_on: Option[DateTime] = None): AccessToken
@@ -75,13 +82,14 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
           t.refresh_token,
           t.refresh_token_expiration,
           t.user_id,
+          t.client_id,
           true,
           t.issued_on,
           Some(DateTime.now)))
     }.getOrElse(Left(GuardbeeError.RevokeAccessTokenError))
   }
 
-  def issueAccessToken(user_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
+  def issueAccessToken(user_id: String, client_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
     val new_token = newAccessToken(TokenProvider.generate,
       "Bearer",
       scope,
@@ -89,6 +97,7 @@ abstract class AccessTokenService(app: Application) extends BasePlugin with Guar
       TokenProvider.generate,
       DateTime.now.plusSeconds(OAuth2RefreshTokenExpiresIn),
       user_id,
+      client_id,
       false,
       DateTime.now,
       None)
@@ -127,6 +136,12 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
       None
     }
   }
+  def getAccessTokenByRefreshToken(refresh_token: String): Option[AccessToken] = {
+    getDelegate.map(_.getAccessTokenByRefreshToken(refresh_token)).getOrElse {
+      notInitialized
+      None
+    }
+  }
   def saveAccessToken(access_token: AccessToken): Either[GuardbeeError, Unit] = {
     getDelegate map (_.saveAccessToken(access_token)) getOrElse {
       notInitialized
@@ -139,8 +154,8 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
       Left(GuardbeeError.InternalServerError)
     }
   }
-  def issueAccessToken(user_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
-    getDelegate map (_.issueAccessToken(user_id, scope)) getOrElse {
+  def issueAccessToken(user_id: String, client_id: String, scope: Seq[String]): Either[GuardbeeError, AccessToken] = {
+    getDelegate map (_.issueAccessToken(user_id, client_id, scope)) getOrElse {
       notInitialized
       Left(GuardbeeError.InternalServerError)
     }
@@ -154,6 +169,7 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
     refresh_token: String,
     refresh_token_expiration: DateTime,
     user_id: String,
+    client_id: String,
     revoked: Boolean = false,
     issued_on: DateTime = DateTime.now,
     revoked_on: Option[DateTime] = None): AccessToken = {
@@ -165,6 +181,7 @@ object AccessTokenService extends ServiceCompanion[AccessTokenService] with Guar
       refresh_token,
       refresh_token_expiration,
       user_id,
+      client_id,
       revoked,
       issued_on,
       revoked_on)) getOrElse {

@@ -55,4 +55,8 @@ object GuardbeeError {
   val AuthenticationError = GuardbeeError("", Seq(GuardbeeMessages.AuthenticationError), Status.UNAUTHORIZED)
   val UserNotFoundError = GuardbeeError("", Seq(GuardbeeMessages.UserNotFound), Status.UNAUTHORIZED)
   val AccessDeniedError = GuardbeeError("", Seq(GuardbeeMessages.AccessDenied), Status.UNAUTHORIZED)
+
+  val InvalidRefreshTokenError = GuardbeeError("", Seq(GuardbeeMessages.InvalidRefreshToken), Status.BAD_REQUEST)
+
+
 }

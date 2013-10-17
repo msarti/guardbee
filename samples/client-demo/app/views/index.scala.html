@@ -4,7 +4,7 @@
 
 	@user.map { m =>
     <div class="well">
-        <h1>@m.get("email").getOrElse("") Logged in!</h1>
+        <h1>@m.get("email").getOrElse("") Logged in! <a href="@routes.Application.refresh_token()">refresh token</a></h1>
     </div>
     }.getOrElse {
     <div class="well">
